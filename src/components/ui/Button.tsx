@@ -20,7 +20,7 @@ export const Button = ({ variant = "primary", size = "medium", rounded = false, 
             disabled={isLoading}
             className={`
                 ${variant === "primary" && !outlined && " bg-blue-500 hover:bg-blue-400 text-white border-2 border-blue-500 hover:border-blue-400"}
-                ${variant === "secondary" && !outlined && " bg-slate-800 hover:bg-slate-700 text-white boarder-2 border-slate-800 hover:border-slate-700"}
+                ${variant === "secondary" && !outlined && " bg-slate-800 hover:bg-slate-700 text-white border-2 border-slate-800 hover:border-slate-700"}
                 ${variant === "primary" && outlined && " border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white"}
                 ${variant === "secondary" && outlined && " border-2 border-slate-800 text-slate-800 hover:bg-slate-700 hover:text-white"}
                 ${size === "small" && " text-xs font-semibold"}

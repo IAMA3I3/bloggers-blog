@@ -9,6 +9,16 @@
   --primary: #2563eb;
   --muted: #6b7280;
   --border: #e5e7eb;
+
+  /* hero orb colors — light */
+  --orb-a: #6366f1;
+  --orb-b: #06b6d4;
+  --orb-c: #a78bfa;
+  --orb-a-opacity: 0.35;
+  --orb-b-opacity: 0.3;
+  --orb-c-opacity: 0.18;
+  --grid-color: #171717;
+  --grid-opacity: 0.04;
 }
 
 .dark {
@@ -18,6 +28,13 @@
   --primary: #2B7FFF;
   --muted: #b2b9c5;
   --border: #34445a;
+
+  /* hero orb colors — dark (more vivid) */
+  --orb-a-opacity: 0.55;
+  --orb-b-opacity: 0.45;
+  --orb-c-opacity: 0.22;
+  --grid-color: #ffffff;
+  --grid-opacity: 0.04;
 }
 
 @theme inline {
@@ -35,8 +52,8 @@ body {
 }
 
 
+/* ─── animations ─── */
 
-/* animation */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -51,4 +68,64 @@ body {
 
 .animate-fadeIn {
   animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes floatA {
+  0%, 100% { transform: translate(0px, 0px) scale(1); }
+  50%       { transform: translate(40px, 50px) scale(1.08); }
+}
+
+@keyframes floatB {
+  0%, 100% { transform: translate(0px, 0px) scale(1); }
+  50%       { transform: translate(-50px, -40px) scale(1.1); }
+}
+
+@keyframes floatC {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50%       { transform: translate(calc(-50% + 30px), calc(-50% - 25px)) scale(1.05); }
+}
+
+/* hero background utilities */
+.hero-orb-a {
+  background: radial-gradient(circle, var(--orb-a) 0%, transparent 70%);
+  opacity: var(--orb-a-opacity);
+  animation: floatA 4s ease-in-out infinite;
+  transition: opacity 0.4s ease;
+}
+
+.hero-orb-b {
+  background: radial-gradient(circle, var(--orb-b) 0%, transparent 70%);
+  opacity: var(--orb-b-opacity);
+  animation: floatB 5s ease-in-out infinite;
+  transition: opacity 0.4s ease;
+}
+
+.hero-orb-c {
+  background: radial-gradient(circle, var(--orb-c) 0%, transparent 65%);
+  opacity: var(--orb-c-opacity);
+  animation: floatC 6s ease-in-out infinite;
+  transition: opacity 0.4s ease;
+}
+
+.hero-grid {
+  background-image:
+    linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+  background-size: 60px 60px;
+  opacity: var(--grid-opacity);
+  transition: opacity 0.4s ease;
+}
+
+@keyframes marquee {
+  from {translate: 0;}
+  to {translate: -100%;}
+}
+
+.animate-marquee {
+  animation: marquee 20s infinite linear;
+}
+
+
+.marquee-container::-webkit-scrollbar {
+  display: none;
 }

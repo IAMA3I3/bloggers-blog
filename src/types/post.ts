@@ -1,0 +1,1 @@
+export type PostCategory = "web-development" | "productivity" | "architecture"

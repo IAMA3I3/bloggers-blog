@@ -52,7 +52,7 @@ export default function NavbarClient() {
 
     return (
         <>
-            <header className={`${isSticky ? "border-b shadow dark:shadow-black/40" : ""} transition-all duration-500 sticky top-0 z-50 border-border bg-background/80 backdrop-blur`}>
+            <header className={`${isSticky ? "border-b shadow bg-background/80 dark:shadow-black/40" : ""} transition-all duration-500 fixed w-full top-0 z-50 border-border backdrop-blur`}>
                 <nav className={`${isSticky ? "py-2 px-6" : "py-8 px-10 md:px-16"} transition-all duration-500 container mx-auto flex items-center justify-between`}>
 
                     {/* Logo */}
