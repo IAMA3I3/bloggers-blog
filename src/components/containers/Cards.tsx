@@ -3,9 +3,10 @@ type BasicCardProps = {
     noPadding?: boolean
     hoverEffect?: boolean
     noBackground?: boolean
+    overflow?: boolean
 }
 
-export const BasicCard = ({ children, noPadding = false, hoverEffect = false, noBackground = false }: BasicCardProps) => {
+export const BasicCard = ({ children, noPadding = false, hoverEffect = false, noBackground = false, overflow = false }: BasicCardProps) => {
 
     return (
         <div
@@ -13,7 +14,8 @@ export const BasicCard = ({ children, noPadding = false, hoverEffect = false, no
                 ${noPadding ? "" : " p-5"}
                 ${hoverEffect ? " hover:shadow-2xl" : ""}
                 ${noBackground ? "" : " bg-background/60"}
-                rounded-xl border border-border backdrop-blur-sm shadow-lg overflow-hidden dark:shadow-black group
+                ${overflow ? "" : " overflow-hidden"}
+                rounded-xl border border-border backdrop-blur-sm shadow-lg dark:shadow-black group
             `}
         >
             {children}
