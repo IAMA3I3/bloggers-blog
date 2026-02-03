@@ -116,6 +116,8 @@ body {
   transition: opacity 0.4s ease;
 }
 
+
+/* marquee */
 @keyframes marquee {
   from {translate: 0;}
   to {translate: -100%;}

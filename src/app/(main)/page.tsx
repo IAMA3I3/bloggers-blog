@@ -1,3 +1,4 @@
+import Features from "@/components/sections/Features";
 import Hero from "@/components/sections/Hero";
 import TechStackStrip from "@/components/sections/TechStackStrip";
 
@@ -7,6 +8,7 @@ export default async function Home() {
     <div className=" flex-1">
       <Hero />
       <TechStackStrip />
+      <Features />
     </div>
   );
 }
