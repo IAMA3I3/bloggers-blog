@@ -1,3 +1,4 @@
+import FeaturedArticles from "@/components/sections/FeaturedArticles";
 import Features from "@/components/sections/Features";
 import Hero from "@/components/sections/Hero";
 import TechStackStrip from "@/components/sections/TechStackStrip";
@@ -9,6 +10,7 @@ export default async function Home() {
       <Hero />
       <TechStackStrip />
       <Features />
+      <FeaturedArticles />
     </div>
   );
 }

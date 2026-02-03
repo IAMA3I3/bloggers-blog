@@ -10,7 +10,7 @@ import { BasicCard } from "../containers/Cards"
 
 export default function Features() {
     return (
-        <section className="bg-white/80 py-24 dark:bg-gray-950">
+        <section className="bg-gray-100 py-24 dark:bg-gray-950">
             <div className=" container mx-auto px-6">
 
                 {/* Section header */}
