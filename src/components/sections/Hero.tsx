@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Button } from "../ui/Button";
 import { HeroPostCard } from "../posts/PostCard";
+import { Suspense } from "react";
 
 export default function Hero() {
     return (
@@ -54,31 +55,69 @@ export default function Hero() {
 
                 {/* RIGHT */}
                 <div className="relative mt-16 lg:mt-0">
-                    <div className="space-y-4">
-
-                        {/* Card 1 */}
-                        <HeroPostCard
-                            category="web-development"
-                            title="Building scalable apps with Next.js"
-                            content="Learn how modern Next.js features like Server Components and Server Actions improve performance."
-                        />
-
-                        {/* Card 2 */}
-                        <HeroPostCard
-                            category="productivity"
-                            title="Writing clean content that converts"
-                            content="Why clarity, structure, and simplicity matter more than volume."
-                        />
-
-                        {/* Card 3 */}
-                        <HeroPostCard
-                            category="architecture"
-                            title="Designing production-ready systems"
-                            content="Lessons from building real-world full-stack applications."
-                        />
-                    </div>
+                    <Suspense fallback={<SkeletonLoading />}>
+                        <HeroPostCards />
+                    </Suspense>
                 </div>
             </div>
         </section>
     );
+}
+
+async function HeroPostCards() {
+
+    await new Promise(res => setTimeout(res, 2000))
+
+    return (
+        <div className="space-y-4">
+            {/* Card 1 */}
+            <HeroPostCard
+                category="web-development"
+                title="Building scalable apps with Next.js"
+                content="Learn how modern Next.js features like Server Components and Server Actions improve performance."
+            />
+
+            {/* Card 2 */}
+            <HeroPostCard
+                category="productivity"
+                title="Writing clean content that converts"
+                content="Why clarity, structure, and simplicity matter more than volume."
+            />
+
+            {/* Card 3 */}
+            <HeroPostCard
+                category="architecture"
+                title="Designing production-ready systems"
+                content="Lessons from building real-world full-stack applications."
+            />
+        </div>
+    )
+}
+
+function SkeletonLoading() {
+
+    return (
+        <div className="space-y-4">
+            {/* skeleton loading design */}
+            {
+                [1, 2, 3].map(i => (
+                    <div key={i} className=" relative rounded-xl p-5 border border-border bg-background/60 backdrop-blur-sm shadow-lg overflow-hidden group">
+
+                        {/* Shimmer effect overlay */}
+                        <div className="absolute inset-0">
+                            <div className="absolute inset-0 -translate-x-full animate-shimmer">
+                                <div className="h-full w-[200%] bg-linear-to-r from-transparent via-white/60 dark:via-white/15 to-transparent skew-x-[-20deg]" />
+                            </div>
+                        </div>
+
+                        <span className="text-xs inline-block font-medium text-white/0 bg-muted/50 rounded-lg leading-none">Lorem.</span>
+                        <br />
+                        <h3 className="mt-2 text-base inline-block font-semibold text-white/0 bg-muted/50 rounded-lg leading-none">Lorem ipsum dolor sit amet.</h3>
+                        <p className="mt-2 text-sm text-white/0 bg-muted/50 rounded-lg w-full leading-none">text</p>
+                        <p className="mt-2 text-sm text-white/0 bg-muted/50 rounded-lg w-1/2 leading-none">text</p>
+                    </div>
+                ))
+            }
+        </div>
+    )
 }

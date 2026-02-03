@@ -75,7 +75,7 @@ function Feature({
     description: string
 }) {
     return (
-        <BasicCard hoverEffect>
+        <BasicCard>
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-gray-100">
                 <span className="text-xl">{icon}</span>
             </div>
