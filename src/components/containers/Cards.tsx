@@ -2,16 +2,18 @@ type BasicCardProps = {
     children: React.ReactNode
     noPadding?: boolean
     hoverEffect?: boolean
+    noBackground?: boolean
 }
 
-export const BasicCard = ({ children, noPadding = false, hoverEffect = false }: BasicCardProps) => {
+export const BasicCard = ({ children, noPadding = false, hoverEffect = false, noBackground = false }: BasicCardProps) => {
 
     return (
         <div
             className={`
                 ${noPadding ? "" : " p-5"}
                 ${hoverEffect ? " hover:shadow-2xl" : ""}
-                rounded-xl border border-border bg-background/60 backdrop-blur-sm shadow-lg overflow-hidden group
+                ${noBackground ? "" : " bg-background/60"}
+                rounded-xl border border-border backdrop-blur-sm shadow-lg overflow-hidden dark:shadow-black group
             `}
         >
             {children}

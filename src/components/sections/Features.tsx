@@ -10,7 +10,7 @@ import { BasicCard } from "../containers/Cards"
 
 export default function Features() {
     return (
-        <section className="bg-gray-100 py-24 dark:bg-gray-950">
+        <section className="bg-gray-100 py-24 dark:bg-gray-800">
             <div className=" container mx-auto px-6">
 
                 {/* Section header */}
@@ -75,8 +75,8 @@ function Feature({
     description: string
 }) {
     return (
-        <BasicCard>
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-gray-100">
+        <BasicCard noBackground>
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-300 text-gray-900 dark:bg-gray-900 dark:text-gray-100">
                 <span className="text-xl">{icon}</span>
             </div>
 
