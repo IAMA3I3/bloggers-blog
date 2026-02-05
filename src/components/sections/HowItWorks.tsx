@@ -3,7 +3,7 @@ import { BasicCard } from "../containers/Cards"
 
 export default function HowItWorks() {
     return (
-        <section className="bg-background py-24 dark:bg-gray-800">
+        <section className="bg-gray-100 py-24 dark:bg-gray-800">
             <div className=" container mx-auto px-6">
 
                 {/* Header */}
