@@ -85,7 +85,7 @@ export const FeaturedPostCard = ({ variant = "primary", category, media = [defau
                             ${category === "web-development" && " text-indigo-500! dark:text-indigo-400!"}
                             ${category === "productivity" && " text-emerald-600! dark:text-emerald-400!"}
                             ${category === "architecture" && " text-rose-600! dark:text-rose-400!"}
-                            text-xs font-medium text-muted capitalize py-1 px-3 rounded bg-white/30
+                            text-xs font-medium text-muted capitalize py-1 px-3 rounded bg-white/30 backdrop-blur-md
                         `}
                     >
                         {category.replace("-", " ")}
