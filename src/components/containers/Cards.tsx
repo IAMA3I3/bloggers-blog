@@ -15,7 +15,7 @@ export const BasicCard = ({ children, noPadding = false, hoverEffect = false, no
                 ${hoverEffect ? " hover:shadow-2xl" : ""}
                 ${noBackground ? "" : " bg-background/60"}
                 ${overflow ? "" : " overflow-hidden"}
-                rounded-xl border border-border backdrop-blur-sm shadow-lg dark:shadow-black group
+                rounded-xl border border-border backdrop-blur-sm shadow-lg dark:shadow-black/50 group
             `}
         >
             {children}

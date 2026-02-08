@@ -41,8 +41,8 @@ export const HeroPostCard = ({ category, title, content }: HeroPostCardProps) =>
 type FeaturedPostCardProps = {
     variant?: "primary" | "secondary"
     category: PostCategory
-    media?: PostMedia
-    slug: string
+    media?: PostMedia[]
+    id: string
     title: string
     content: string
     authorName: string
@@ -57,7 +57,11 @@ const defaultMedia: PostMedia = {
     uploadedAt: new Date()
 }
 
-export const FeaturedPostCard = ({ variant = "primary", category, media = defaultMedia, slug, title, content, authorName, createdAt }: FeaturedPostCardProps) => {
+export const FeaturedPostCard = ({ variant = "primary", category, media = [defaultMedia], id, title, content, authorName, createdAt }: FeaturedPostCardProps) => {
+
+    if (media.length === 0) {
+        media = [defaultMedia]
+    }
 
     return (
         <BasicCard noPadding>
@@ -69,10 +73,10 @@ export const FeaturedPostCard = ({ variant = "primary", category, media = defaul
                 `}
             >
                 {
-                    media.type === "image" ? (
-                        <img src={media.url} alt={media.filename} className=" w-full h-full object-cover group-hover:scale-110 transition-all duration-500" />
+                    media[0].type === "image" ? (
+                        <img src={media[0].url} alt={media[0].filename} className=" w-full h-full object-cover group-hover:scale-110 transition-all duration-500" />
                     ) : (
-                        <video src={media.url} autoPlay loop muted className=" w-full h-full object-cover group-hover:scale-110 transition-all duration-500" />
+                        <video src={media[0].url} autoPlay loop muted className=" w-full h-full object-cover group-hover:scale-110 transition-all duration-500" />
                     )
                 }
                 <div className=" absolute top-4 left-4">
@@ -98,7 +102,7 @@ export const FeaturedPostCard = ({ variant = "primary", category, media = defaul
                     `}
                 >
                     <Link
-                        href={`/blog/${slug}`}
+                        href={`/blog/${id}`}
                         className={`
                             ${variant === "primary" ? "text-xl" : " truncate w-full"}
                             mb-2 inline-block hover:text-primary

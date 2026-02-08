@@ -46,7 +46,8 @@ async function FeaturedPostCards() {
             <div className=" lg:col-span-6">
                 <FeaturedPostCard
                     category="web-development"
-                    slug="building-scalable-applications-with-next-js-app-router"
+                    id="building-scalable-applications-with-next-js-app-router"
+                    media={[]}
                     title="Building scalable applications with Next.js App Router"
                     content="A practical guide to structuring modern Next.js applications using Server Components, Server Actions, and best practices."
                     authorName="Ali_Baba"
@@ -57,7 +58,7 @@ async function FeaturedPostCards() {
                 <FeaturedPostCard
                     variant="secondary"
                     category="productivity"
-                    slug="writing-clean-technical-content-that-converts"
+                    id="writing-clean-technical-content-that-converts"
                     title="Writing clean technical content that converts"
                     content="Why clarity and structure matter more than volume in technical writing."
                     authorName="Ali_Baba"
@@ -66,7 +67,7 @@ async function FeaturedPostCards() {
                 <FeaturedPostCard
                     variant="secondary"
                     category="architecture"
-                    slug="designing-production-ready-systems-as-a-solo-developer"
+                    id="designing-production-ready-systems-as-a-solo-developer"
                     title="Designing production-ready systems as a solo developer"
                     content="Lessons learned from building and shipping real-world full-stack apps."
                     authorName="Ali_Baba"

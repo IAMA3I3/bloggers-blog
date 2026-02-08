@@ -1,5 +1,6 @@
 import { IconType } from "react-icons"
 import { LoadingSpinner } from "./Loading"
+import { dashedToCapitalized } from "@/utils/textFormat"
 
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
     variant?: "primary" | "secondary"
@@ -81,6 +82,26 @@ export const Button = ({ variant = "primary", size = "medium", rounded = false, 
                         }
                     </>
             }
+        </button>
+    )
+}
+
+type StateButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    isActive?: boolean
+    text?: string
+}
+
+export const StateButton = ({ isActive, text, ...rest }: StateButtonProps) => {
+
+    return (
+        <button
+            {...rest}
+            className={`
+                ${isActive ? " border-primary bg-primary text-white" : " border-border dark:border-gray-500 bg-transparent text-muted hover:border-primary hover:text-primary"}
+                text-sm font-semibold tracking-wide py-2 px-4 rounded-full border-2 text-nowrap cursor-pointer active:scale-95
+            `}
+        >
+            {text && dashedToCapitalized(text)}
         </button>
     )
 }

@@ -1,4 +1,4 @@
-export type PostCategory = "web-development" | "productivity" | "architecture" | "others"
+export type PostCategory = "web-development" | "productivity" | "architecture" | "design" | "technology" | "tutorial" | "others"
 
 export type MediaType = "image" | "video"
 
@@ -22,6 +22,7 @@ export type Post = {
     content: string
     userId: string
     category: PostCategory
+    featured: boolean
     media: PostMedia[] // Array of media files
     createdAt: Date
     updatedAt: Date
