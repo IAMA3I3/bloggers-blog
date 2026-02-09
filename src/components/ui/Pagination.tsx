@@ -5,7 +5,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react"
 type PaginationProps = {
     totalPages: number
     currentPage: number
-    setCurrentPage: Dispatch<SetStateAction<number>>
+    setCurrentPage: (page: number) => void
     onPageChange?: () => void
 }
 
@@ -84,7 +84,7 @@ export default function Pagination({ totalPages, currentPage, setCurrentPage, on
             <button
                 disabled={currentPage === 1}
                 onClick={() => {
-                    setCurrentPage((p) => p - 1)
+                    setCurrentPage(currentPage - 1)
                     onPageChange()
                 }}
                 className="rounded-full border border-border dark:border-gray-500 px-3 py-2 text-sm text-muted disabled:opacity-40 md:px-4 hover:border-primary hover:text-primary disabled:pointer-events-none"
@@ -128,7 +128,7 @@ export default function Pagination({ totalPages, currentPage, setCurrentPage, on
             <button
                 disabled={currentPage === totalPages}
                 onClick={() => {
-                    setCurrentPage((p) => p + 1)
+                    setCurrentPage(currentPage + 1)
                     onPageChange()
                 }}
                 className="rounded-full border border-border dark:border-gray-500 px-3 py-2 text-sm text-muted disabled:opacity-40 md:px-4 hover:border-primary hover:text-primary disabled:pointer-events-none"
