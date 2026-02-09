@@ -12,7 +12,7 @@ export default function PageHeader({ title, subtitle, currentPage }: PageHeaderP
         <section  className=" container px-6 pt-28 mx-auto">
             <div className=" rounded-2xl p-8 border-2 border-border shadow-lg bg-linear-to-tr from-black/20 dark:from-white/20 via-black/5 dark:via-white/5 to-black/20 dark:to-white/20">
                 <h1 className=" text-2xl md:text-4xl text-center">{title}</h1>
-                <p className=" text-muted text-center mt-2">{subtitle}</p>
+                <p className=" text-muted text-center mt-2 max-w-200 mx-auto">{subtitle}</p>
                 {
                     currentPage && (
                         <div className=" mt-4 flex items-center justify-center gap-2">
