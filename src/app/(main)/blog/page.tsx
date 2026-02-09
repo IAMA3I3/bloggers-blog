@@ -18,23 +18,12 @@ export const metadata: Metadata = {
     },
 }
 
-type BlogPageParams = {
-    searchParams: Promise<{
-        page?: string
-        category?: string
-        search?: string
-        sort?: string
-    }>
-}
-
-export default async function BlogPage({ searchParams }: BlogPageParams) {
-
-    const searchQueries = await searchParams
+export default async function BlogPage() {
 
     return (
         <div className=" flex-1">
             <PageHeader title="Blog" subtitle="Insights, tutorials, and stories from writers building on Bloggers Blog." currentPage="Blog" />
-            <BlogPosts searchQueries={searchQueries} />
+            <BlogPosts />
             <CTA
                 text="Ready to start writing?"
                 subText="Join writers who value clarity, simplicity, and thoughtful publishing."
