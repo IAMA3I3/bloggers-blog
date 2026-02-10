@@ -4,7 +4,21 @@ import CTA from "@/components/sections/CTA";
 import HowItWorks from "@/components/sections/HowItWorks";
 import Values from "@/components/sections/Values";
 import { Button } from "@/components/ui/Button";
+import { siteUrl } from "@/utils/appStore";
+import { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+    title: "About",
+    description:
+        "Learn more about Bloggers Blog — our mission, vision, and the ideas behind this modern content publishing platform.",
+    openGraph: {
+        title: "About | Bloggers Blog",
+        description:
+            "Discover the mission and story behind Bloggers Blog.",
+        url: `${siteUrl}/about`,
+    },
+}
 
 export default function AboutPage() {
 
