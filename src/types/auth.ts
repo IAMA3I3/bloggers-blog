@@ -7,6 +7,10 @@ export type SignUpFormData = {
     confirmPassword: string
 }
 
+export type ForgetPasswordFormData = {
+    email: string
+}
+
 export type SignInFormData = {
     identifier: string // either mail or username
     password: string
