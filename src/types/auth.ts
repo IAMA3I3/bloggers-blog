@@ -11,6 +11,12 @@ export type ForgetPasswordFormData = {
     email: string
 }
 
+export type ResetPasswordFormData = {
+    otp: string
+    password: string
+    confirmPassword: string
+}
+
 export type SignInFormData = {
     identifier: string // either mail or username
     password: string
