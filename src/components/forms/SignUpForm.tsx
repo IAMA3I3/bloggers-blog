@@ -57,6 +57,7 @@ export default function SignUpForm() {
                     type="text"
                     name="username"
                     label="Username"
+                    id="username"
                     backgroundColor=" bg-white dark:bg-slate-900"
                     error={error.username || undefined}
                 />
@@ -67,6 +68,7 @@ export default function SignUpForm() {
                     type="text"
                     name="email"
                     label="Email"
+                    id="email"
                     backgroundColor=" bg-white dark:bg-slate-900"
                     error={error.email || undefined}
                 />
@@ -77,6 +79,7 @@ export default function SignUpForm() {
                     type="text"
                     name="password"
                     label="Password"
+                    id="password"
                     viewPassword
                     backgroundColor=" bg-white dark:bg-slate-900"
                     error={error.password || undefined}
@@ -88,6 +91,7 @@ export default function SignUpForm() {
                     type="text"
                     name="confirmPassword"
                     label="Confirm Password"
+                    id="confirmPassword"
                     viewPassword
                     backgroundColor=" bg-white dark:bg-slate-900"
                     error={error.confirmPassword || undefined}

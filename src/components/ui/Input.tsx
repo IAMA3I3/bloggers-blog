@@ -46,6 +46,7 @@ export function Input({ variant = "primary", customSize = "medium", label, backg
                 {
                     label && variant === "secondary" && (
                         <label
+                            htmlFor={rest.id}
                             className={`
                             ${customSize === "small" && " text-sm translate-x-2"}
                             ${customSize === "medium" && " text-base translate-x-3"}
@@ -144,6 +145,7 @@ export function Textarea({ variant = "primary", customSize = "medium", label, ba
                 {
                     label && variant === "secondary" && (
                         <label
+                            htmlFor={rest.id}
                             className={`
                             ${customSize === "small" && " text-sm translate-x-2"}
                             ${customSize === "medium" && " text-base translate-x-3"}

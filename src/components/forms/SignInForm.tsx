@@ -56,6 +56,7 @@ export default function () {
                     type="text"
                     name="identifier"
                     label="Username / Email"
+                    id="identifier"
                     backgroundColor=" bg-white dark:bg-slate-900"
                     error={error.identifier || undefined}
                 />
@@ -66,6 +67,7 @@ export default function () {
                     type="text"
                     name="password"
                     label="Password"
+                    id="password"
                     viewPassword
                     backgroundColor=" bg-white dark:bg-slate-900"
                     error={error.password || undefined}

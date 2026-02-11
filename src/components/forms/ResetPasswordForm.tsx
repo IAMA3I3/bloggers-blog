@@ -55,6 +55,7 @@ export default function ResetPasswordForm() {
                     type="text"
                     name="otp"
                     label="OTP"
+                    id="otp"
                     backgroundColor=" bg-white dark:bg-slate-900"
                     error={error.otp || undefined}
                 />

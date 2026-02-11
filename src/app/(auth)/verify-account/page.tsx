@@ -1,4 +1,5 @@
 import AuthFormContainer from "@/components/containers/AuthFormContainer";
+import VerifyAccountForm from "@/components/forms/VerifyAccountForm";
 import { siteUrl } from "@/utils/appStore";
 import { Metadata } from "next";
 
@@ -22,7 +23,7 @@ export default function ForgetPasswordPage() {
 
     return (
         <AuthFormContainer header="Verify Account" subHeader="Enter the OTP that was sent to user@gmail.com">
-            Verify
+            <VerifyAccountForm />
         </AuthFormContainer>
     )
 }
