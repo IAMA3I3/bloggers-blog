@@ -17,6 +17,10 @@ export type ResetPasswordFormData = {
     confirmPassword: string
 }
 
+export type VerifyAccountFormData = {
+    otp: string
+}
+
 export type SignInFormData = {
     identifier: string // either mail or username
     password: string

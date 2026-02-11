@@ -81,7 +81,7 @@ export function Input({ variant = "primary", customSize = "medium", label, backg
                                 ${customSize === "small" && " text-sm right-2"}
                                 ${customSize === "medium" && " text-base right-3"}
                                 ${customSize === "large" && " text-lg right-4"}
-                                absolute top-[50%] -translate-y-[50%] cursor-pointer
+                                absolute top-[50%] -translate-y-[50%] cursor-pointer text-muted
                             `}
                         >
                             {
