@@ -1,3 +1,5 @@
+"use client"
+
 import { useStateContext } from "@/app/context/StateContext"
 import { useEffect, useState } from "react"
 import { IoMoon, IoSunny } from "react-icons/io5"

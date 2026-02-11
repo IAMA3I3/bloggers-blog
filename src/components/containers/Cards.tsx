@@ -38,7 +38,7 @@ export const PageCard = ({ children, fullWidth = false, fullHeight = false, cent
                 ${fullWidth ? "" : " max-w-150"}
                 ${fullHeight ? " h-full" : ""}
                 ${centerAlign ? " mx-auto" : ""}
-                w-full p-6 rounded-lg shadow-lg bg-white border-2 border-gray-100
+                w-full p-6 rounded-lg shadow-lg bg-white dark:bg-slate-900 border-2 border-gray-100 dark:border-slate-800 dark:shadow-black/70 backdrop-blur-md
             `}
         >
             <div className=" w-full h-full overflow-y-auto">
