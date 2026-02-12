@@ -23,21 +23,25 @@ export const BasicCard = ({ children, noPadding = false, hoverEffect = false, no
     )
 }
 
-type PageCardProps = {
+type PageCardProps = React.HTMLAttributes<HTMLDivElement> & {
     children: React.ReactNode
     fullWidth?: boolean
     fullHeight?: boolean
     centerAlign?: boolean
+    scaleDown?: boolean
 }
 
-export const PageCard = ({ children, fullWidth = false, fullHeight = false, centerAlign = false }: PageCardProps) => {
+export const PageCard = ({ children, fullWidth = false, fullHeight = false, centerAlign = false, scaleDown = false, ...rest }: PageCardProps) => {
 
     return (
         <div
+            {...rest}
             className={`
                 ${fullWidth ? "" : " max-w-150"}
                 ${fullHeight ? " h-full" : ""}
                 ${centerAlign ? " mx-auto" : ""}
+                ${scaleDown ? " scale-50" : " scale-100"}
+                transition-all duration-500
                 w-full p-6 rounded-lg shadow-lg bg-white dark:bg-slate-900 border-2 border-gray-100 dark:border-slate-800 dark:shadow-black/70 backdrop-blur-md
             `}
         >

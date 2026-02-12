@@ -1,5 +1,6 @@
 "use client"
 
+import { useStateContext } from "@/app/context/StateContext";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react"
 import { FaAngleDown, FaUser } from "react-icons/fa6";
@@ -9,6 +10,8 @@ type UserButtonProps = {
 }
 
 export default function UserButton({ from }: UserButtonProps) {
+
+    const { setModalProps, setIsModalOpen } = useStateContext()
 
     const dropDownRef = useRef<HTMLDivElement | null>(null)
     const buttonRef = useRef<HTMLButtonElement | null>(null)
@@ -21,6 +24,15 @@ export default function UserButton({ from }: UserButtonProps) {
 
     const closeDropMenu = () => {
         setDropedMenu(false)
+    }
+
+    const openLogoutModal = () => {
+        setModalProps(prev => ({
+            ...prev,
+            title: "Logout",
+            text: "Proceed to logout"
+        }))
+        setIsModalOpen(true)
     }
 
     useEffect(() => {
@@ -82,7 +94,7 @@ export default function UserButton({ from }: UserButtonProps) {
                             <Link href={"/dashboard"} className=" block text-center w-full py-2 px-6 bg-gray-200 dark:bg-slate-700 text-xs font-semibold rounded cursor-pointer hover:bg-primary/20 hover:text-primary">Dashboard</Link>
                         )
                     }
-                    <button className=" w-full text-center py-2 px-6 bg-gray-200 dark:bg-slate-700 text-xs font-semibold rounded cursor-pointer hover:bg-red-300 hover:text-red-700">Logout</button>
+                    <button onClick={openLogoutModal} className=" w-full text-center py-2 px-6 bg-gray-200 dark:bg-slate-700 text-xs font-semibold rounded cursor-pointer hover:bg-red-300 hover:text-red-700">Logout</button>
                 </div>
             </div>
         </div>

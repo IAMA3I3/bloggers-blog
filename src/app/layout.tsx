@@ -4,6 +4,7 @@ import "./globals.css";
 import { StateProvider } from "./context/StateContext";
 import { siteUrl } from "@/utils/appStore";
 import { Toaster } from "react-hot-toast";
+import Modal from "@/components/ui/Modal";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -74,9 +75,10 @@ export default function RootLayout({
     <html lang="en">
       <StateProvider>
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col cursor-default`}
+          className={`${geistSans.variable} ${geistMono.variable} antialiased relative min-h-screen flex flex-col cursor-default`}
         >
           {children}
+          <Modal />
           <Toaster position="bottom-right" />
         </body>
       </StateProvider>

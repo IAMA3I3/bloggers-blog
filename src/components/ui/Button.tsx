@@ -3,7 +3,7 @@ import { LoadingSpinner } from "./Loading"
 import { dashedToCapitalized } from "@/utils/textFormat"
 
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
-    variant?: "primary" | "secondary"
+    variant?: "primary" | "secondary" | "success" | "danger"
     size?: "small" | "medium" | "large" | "inherit"
     rounded?: boolean
     outlined?: boolean
@@ -22,14 +22,18 @@ export const Button = ({ variant = "primary", size = "medium", rounded = false, 
             className={`
                 ${variant === "primary" && !outlined && " bg-blue-500 hover:bg-blue-400 text-white border-2 border-blue-500 hover:border-blue-400"}
                 ${variant === "secondary" && !outlined && " bg-slate-800 hover:bg-slate-700 text-white border-2 border-slate-800 hover:border-slate-700"}
+                ${variant === "success" && !outlined && " bg-green-500 hover:bg-green-400 text-white border-2 border-green-500 hover:border-green-400"}
+                ${variant === "danger" && !outlined && " bg-red-400 hover:bg-red-300 text-white border-2 border-red-400 hover:border-red-300"}
                 ${variant === "primary" && outlined && " border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white"}
                 ${variant === "secondary" && outlined && " border-2 border-slate-800 text-slate-800 hover:bg-slate-700 hover:text-white"}
+                ${variant === "success" && outlined && " border-2 border-green-500 text-green-500 hover:bg-green-500 hover:text-white"}
+                ${variant === "danger" && outlined && " border-2 border-red-400 text-red-400 hover:bg-red-400 hover:text-white"}
                 ${size === "small" && " text-xs font-semibold"}
                 ${size === "medium" && " text-sm"}
                 ${size === "large" && " text-base"}
                 ${rounded ? " rounded-full" : " rounded"}
-                ${fullWidth && "w-full justify-center"}
-                py-2 px-6 tracking-wider flex items-center gap-2
+                ${fullWidth && "w-full"}
+                py-2 px-6 tracking-wider flex items-center justify-center gap-2
                 disabled:bg-gray-400 disabled:text-white cursor-pointer
                 disabled:pointer-events-none active:scale-95 leading-none
                 disabled:border-gray-400 relative
