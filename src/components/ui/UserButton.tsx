@@ -89,7 +89,7 @@ export default function UserButton({ from }: UserButtonProps) {
                 <div className=" mt-2 space-y-2">
                     {
                         from === "DASHBOARD" ? (
-                            <Link href={"/profile"} className=" block text-center w-full py-2 px-6 bg-gray-200 dark:bg-slate-700 text-xs font-semibold rounded cursor-pointer hover:bg-primary/20 hover:text-primary">Profile</Link>
+                            <Link href={"/dashboard/profile"} className=" block text-center w-full py-2 px-6 bg-gray-200 dark:bg-slate-700 text-xs font-semibold rounded cursor-pointer hover:bg-primary/20 hover:text-primary">Profile</Link>
                         ) : (
                             <Link href={"/dashboard"} className=" block text-center w-full py-2 px-6 bg-gray-200 dark:bg-slate-700 text-xs font-semibold rounded cursor-pointer hover:bg-primary/20 hover:text-primary">Dashboard</Link>
                         )
