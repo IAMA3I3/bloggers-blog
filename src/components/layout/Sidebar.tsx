@@ -5,10 +5,10 @@ import { UserRole } from "@/types/auth";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { IconType } from "react-icons";
-import { LuLayoutDashboard } from "react-icons/lu";
+import { TbLayoutDashboardFilled } from "react-icons/tb";
 import ThemeToggle from "../ui/ThemeToggle";
 import { FaUser } from "react-icons/fa6";
-import { FaUsers, FaBlog } from "react-icons/fa";
+import { FaUsers, FaBlog, FaBell } from "react-icons/fa";
 import { Logo } from "../ui/Logo";
 
 type NavLink = {
@@ -19,9 +19,10 @@ type NavLink = {
 }
 
 const navLinks: NavLink[] = [
-    { title: "Overview", href: "/dashboard", icon: LuLayoutDashboard, access: ["admin", "user"] },
+    { title: "Overview", href: "/dashboard", icon: TbLayoutDashboardFilled, access: ["admin", "user"] },
     { title: "Users", href: "/dashboard/users", icon: FaUsers, access: ["admin"] },
     { title: "Posts", href: "/dashboard/posts", icon: FaBlog, access: ["admin", "user"] },
+    { title: "Notifications", href: "/dashboard/notifications", icon: FaBell, access: ["admin", "user"] },
 ]
 
 export default function Sidebar() {
@@ -41,7 +42,7 @@ export default function Sidebar() {
                 <div className="flex flex-col h-full">
                     {/* Logo */}
                     <div className="flex items-center justify-between p-4 border-b border-gray-800">
-                        <Link href={"/"} className={`flex w-full items-center space-x-3 ${!isSideBarOpened && 'lg:justify-center'}`}>
+                        <Link href={"/"} className={`flex w-full items-center space-x-3 *:flex-none ${!isSideBarOpened && 'lg:justify-center'}`}>
                             <Logo size="small" />
                             {isSideBarOpened && <span className="text-xl font-semibold truncate">Bloggers Blog</span>}
                         </Link>

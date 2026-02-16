@@ -1,7 +1,7 @@
 import { Suspense } from "react"
 import BlogFilter from "./BlogFilter"
 import BlogPostsClient from "./BlogPosts.client"
-import { posts } from "@/app/temp/postsData"
+import { posts } from "@/temp/postsData"
 
 export default function BlogPosts() {
 

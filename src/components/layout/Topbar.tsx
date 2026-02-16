@@ -3,9 +3,9 @@
 import { useStateContext } from "@/app/context/StateContext"
 import UserButton from "@/components/ui/UserButton"
 import { CgClose } from "react-icons/cg"
-import { FaRegBell } from "react-icons/fa"
 import { FiMenu } from "react-icons/fi"
 import { IoSearch } from "react-icons/io5"
+import NotificationButton from "../ui/NotificationButton"
 
 export default function Topbar() {
 
@@ -33,10 +33,7 @@ export default function Topbar() {
                 </div>
 
                 <div className="flex items-center space-x-4">
-                    <button className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
-                        <FaRegBell className="w-6 h-6" />
-                        <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                    </button>
+                    <NotificationButton />
 
                     <UserButton from="DASHBOARD" />
                 </div>

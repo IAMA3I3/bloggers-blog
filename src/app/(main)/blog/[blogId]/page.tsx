@@ -6,7 +6,6 @@ import { Suspense } from "react"
 import BlogMedia from "@/components/sections/blog-posts/BlogMedia"
 import { HeartTick } from "@/components/ui/Ticks"
 import { BiCommentDetail } from "react-icons/bi";
-import Link from "next/link"
 import CommentForm from "@/components/forms/CommentForm"
 import BlogComments from "@/components/sections/blog-details/BlogComments"
 import { LoadingSpinner } from "@/components/ui/Loading"

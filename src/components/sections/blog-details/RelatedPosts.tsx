@@ -1,4 +1,4 @@
-import { posts } from "@/app/temp/postsData"
+import { posts } from "@/temp/postsData"
 import { FeaturedPostCard } from "@/components/posts/PostCard"
 import { Button } from "@/components/ui/Button"
 import Link from "next/link"
