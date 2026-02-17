@@ -4,8 +4,8 @@ import { useStateContext } from "@/app/context/StateContext"
 import UserButton from "@/components/ui/UserButton"
 import { CgClose } from "react-icons/cg"
 import { FiMenu } from "react-icons/fi"
-import { IoSearch } from "react-icons/io5"
 import NotificationButton from "../ui/NotificationButton"
+import SearchBar from "../ui/SearchBar"
 
 export default function Topbar() {
 
@@ -22,14 +22,7 @@ export default function Topbar() {
                         {isSideBarOpened ? <CgClose className="w-6 h-6" /> : <FiMenu className="w-6 h-6" />}
                     </button>
 
-                    <div className="hidden md:flex items-center bg-gray-200 dark:bg-gray-600 text-muted rounded-lg px-4 py-2 w-96">
-                        <IoSearch className="w-5 h-5 text-gray-400 mr-2" />
-                        <input
-                            type="text"
-                            placeholder="Search..."
-                            className="bg-transparent outline-none w-full text-sm"
-                        />
-                    </div>
+                    <SearchBar />
                 </div>
 
                 <div className="flex items-center space-x-4">

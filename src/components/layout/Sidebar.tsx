@@ -51,7 +51,7 @@ export default function Sidebar() {
                         {
                             navLinks.map(navLink => {
                                 const Icon = navLink.icon
-                                const isActive = pathname === navLink.href || (pathname.startsWith(navLink.href) && navLink.href !== "/")
+                                const isActive = pathname === navLink.href || (pathname.startsWith(navLink.href) && navLink.href !== "/dashboard")
                                 return (
                                     <Link
                                         key={navLink.title}

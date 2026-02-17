@@ -89,9 +89,9 @@ export default function UserButton({ from }: UserButtonProps) {
                 <div className=" mt-2 space-y-2">
                     {
                         from === "DASHBOARD" ? (
-                            <Link href={"/dashboard/profile"} className=" block text-center w-full py-2 px-6 bg-gray-200 dark:bg-slate-700 text-xs font-semibold rounded cursor-pointer hover:bg-primary/20 hover:text-primary">Profile</Link>
+                            <Link href={"/dashboard/profile"} onClick={closeDropMenu} className=" block text-center w-full py-2 px-6 bg-gray-200 dark:bg-slate-700 text-xs font-semibold rounded cursor-pointer hover:bg-primary/20 hover:text-primary">Profile</Link>
                         ) : (
-                            <Link href={"/dashboard"} className=" block text-center w-full py-2 px-6 bg-gray-200 dark:bg-slate-700 text-xs font-semibold rounded cursor-pointer hover:bg-primary/20 hover:text-primary">Dashboard</Link>
+                            <Link href={"/dashboard"} onClick={closeDropMenu} className=" block text-center w-full py-2 px-6 bg-gray-200 dark:bg-slate-700 text-xs font-semibold rounded cursor-pointer hover:bg-primary/20 hover:text-primary">Dashboard</Link>
                         )
                     }
                     <button onClick={openLogoutModal} className=" w-full text-center py-2 px-6 bg-gray-200 dark:bg-slate-700 text-xs font-semibold rounded cursor-pointer hover:bg-red-300 hover:text-red-700">Logout</button>
