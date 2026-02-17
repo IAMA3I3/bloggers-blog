@@ -6,6 +6,7 @@ import { IoSearch } from "react-icons/io5"
 export default function SearchBar() {
 
     const [searchValue, setSearchValue] = useState("")
+    const [debouncedValue, setDebouncedValue] = useState("")
     const [dropedMenu, setDropedMenu] = useState(false)
 
     const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -19,12 +20,22 @@ export default function SearchBar() {
     }
 
     useEffect(() => {
-        if (searchValue.trim() !== "") {
+        const timer = setTimeout(() => {
+            setDebouncedValue(searchValue)
+        }, 400)
+
+        return () => clearTimeout(timer)
+    }, [searchValue])
+
+    useEffect(() => {
+        if (debouncedValue.trim() !== "") {
             setDropedMenu(true)
+
+            console.log("Searching for:", debouncedValue)
         } else {
             setDropedMenu(false)
         }
-    }, [searchValue])
+    }, [debouncedValue])
 
     return (
         <div className=" relative">
