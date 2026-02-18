@@ -48,7 +48,7 @@ export default function NotificationButton() {
 
     return (
         <div className=" relative">
-            <button ref={buttonRef} onClick={toggleDropMenu} className="relative cursor-pointer p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
+            <button ref={buttonRef} onClick={toggleDropMenu} className={`${dropedMenu ? " bg-gray-200 dark:bg-slate-800" : " hover:bg-gray-200 dark:hover:bg-slate-800"} relative cursor-pointer p-2 rounded-lg transition-colors`}>
                 <FaRegBell className="w-6 h-6" />
                 {notifications.length > 0 && <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>}
             </button>

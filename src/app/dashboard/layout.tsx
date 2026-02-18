@@ -6,7 +6,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
     return (
         <>
-            <main className=" flex h-screen">
+            <main className=" flex h-screen bg-gray-100 dark:bg-gray-600">
                 {/* sidebar */}
                 <Sidebar />
                 <div className="flex-1 flex flex-col overflow-hidden">

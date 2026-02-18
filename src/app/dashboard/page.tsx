@@ -1,3 +1,5 @@
+import Stats from "@/components/dashboard/Stats";
+
 export default function DashboardPage() {
 
     return (
@@ -5,6 +7,8 @@ export default function DashboardPage() {
             <h2 className="text-2xl font-semibold mb-6">
                 Dashboard Overview
             </h2>
+            {/* stats */}
+            <Stats />
         </>
     )
 }
