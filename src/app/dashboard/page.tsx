@@ -1,4 +1,6 @@
 import Chart from "@/components/dashboard/Chart";
+import QuickLinks from "@/components/dashboard/QuickLinks";
+import RecentPosts from "@/components/dashboard/RecentPosts";
 import Stats from "@/components/dashboard/Stats";
 
 export default function DashboardPage() {
@@ -13,6 +15,10 @@ export default function DashboardPage() {
                 <Stats />
                 {/* chart */}
                 <Chart />
+                <div className=" flex gap-8 flex-col md:flex-row *:w-full">
+                    <RecentPosts />
+                    <QuickLinks />
+                </div>
             </div>
         </>
     )

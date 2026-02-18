@@ -93,16 +93,13 @@ export default function Chart() {
 
     return (
         <BasicCard noBackground>
-            <div className="p-4 sm:p-6">
                 <h3 className="text-base sm:text-lg font-semibold mb-1">
                     Posts
                 </h3>
                 <p className="text-xs sm:text-sm text-muted mb-4">
                     {strategyLabel} posts tracking
                 </p>
-            </div>
 
-            <div className="px-2 sm:px-6 pb-4 sm:pb-6">
                 <div className="h-64 sm:h-72 md:h-80 w-full">
                     <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                         <LineChart
@@ -142,7 +139,6 @@ export default function Chart() {
                         </LineChart>
                     </ResponsiveContainer>
                 </div>
-            </div>
         </BasicCard>
     );
 }

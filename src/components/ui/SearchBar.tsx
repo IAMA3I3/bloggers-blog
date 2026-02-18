@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { ChangeEvent, useEffect, useState } from "react"
 import { IoSearch } from "react-icons/io5"
+import { LinkListItem } from "./ListItem"
 
 export default function SearchBar() {
 
@@ -66,10 +67,12 @@ export default function SearchBar() {
                         <div className=" space-y-2">
                             <p className=" text-xs font-semibold text-primary">Users</p>
                             {
-                                ["Username","Somebody"].map(user => (
-                                    <Link key={user} href={`/dashboard/users/${user}`} className=" block py-2 px-4 bg-gray-200 dark:bg-slate-700 text-xs font-semibold rounded hover:bg-primary/20 hover:text-primary">
-                                        <p className=" line-clamp-2">{user}</p>
-                                    </Link>
+                                ["Username", "Somebody"].map(user => (
+                                    <LinkListItem
+                                        key={user}
+                                        href={`/dashboard/users/${user}`}
+                                        text={user}
+                                    />
                                 ))
                             }
                         </div>
@@ -77,10 +80,12 @@ export default function SearchBar() {
                         <div className=" space-y-2">
                             <p className=" text-xs font-semibold text-primary">Posts</p>
                             {
-                                ["Post 1","Post 2"].map(post => (
-                                    <Link key={post} href={`/dashboard/posts/${post}`} className=" block py-2 px-4 bg-gray-200 dark:bg-slate-700 text-xs font-semibold rounded hover:bg-primary/20 hover:text-primary">
-                                        <p className=" line-clamp-2">{post}</p>
-                                    </Link>
+                                ["Post 1", "Post 2"].map(post => (
+                                    <LinkListItem
+                                        key={post}
+                                        href={`/dashboard/posts/${post}`}
+                                        text={post}
+                                    />
                                 ))
                             }
                         </div>
@@ -88,10 +93,12 @@ export default function SearchBar() {
                         <div className=" space-y-2">
                             <p className=" text-xs font-semibold text-primary">Notifications</p>
                             {
-                                ["Notification 1","Notification 2"].map(notification => (
-                                    <Link key={notification} href={`/dashboard/notifications/${notification}`} className=" block py-2 px-4 bg-gray-200 dark:bg-slate-700 text-xs font-semibold rounded hover:bg-primary/20 hover:text-primary">
-                                        <p className=" line-clamp-2">{notification}</p>
-                                    </Link>
+                                ["Notification 1", "Notification 2"].map(notification => (
+                                    <LinkListItem
+                                        key={notification}
+                                        href={`/dashboard/notifications/${notification}`}
+                                        text={notification}
+                                    />
                                 ))
                             }
                         </div>

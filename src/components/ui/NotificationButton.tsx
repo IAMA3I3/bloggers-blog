@@ -5,6 +5,7 @@ import { formatPostDate } from "@/utils/formatPostDate"
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 import { FaRegBell } from "react-icons/fa"
+import { LinkListItem } from "./ListItem"
 
 export default function NotificationButton() {
 
@@ -65,10 +66,13 @@ export default function NotificationButton() {
                         notifications.length === 0 ? (
                             <p className=" text-muted text-sm">No unread notifications</p>
                         ) : notifications.slice(0, 5).map(notification => (
-                            <Link key={notification._id} onClick={closeDropMenu} href={`/dashboard/notifications/${notification._id}`} className=" block py-2 px-4 bg-gray-200 dark:bg-slate-700 text-xs font-semibold rounded hover:bg-primary/20 hover:text-primary">
-                                <p className=" text-xs text-muted mb-1">{formatPostDate(notification.createdAt)}</p>
-                                <p className=" line-clamp-2">{notification.content}</p>
-                            </Link>
+                            <LinkListItem
+                                key={notification._id}
+                                onClick={closeDropMenu}
+                                href={`/dashboard/notifications/${notification._id}`}
+                                mutedText={formatPostDate(notification.createdAt)}
+                                text={notification.content}
+                            />
                         ))
                     }
                     <Link href={"/dashboard/notifications"} onClick={closeDropMenu} className=" text-sm text-primary hover:underline">See all notifications</Link>
