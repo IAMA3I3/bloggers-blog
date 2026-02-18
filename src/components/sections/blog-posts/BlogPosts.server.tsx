@@ -1,7 +1,7 @@
 import { Suspense } from "react"
 import BlogFilter from "./BlogFilter"
 import BlogPostsClient from "./BlogPosts.client"
-import { posts } from "@/temp/postsData"
+import { mockPosts } from "@/temp/postsData"
 
 export default function BlogPosts() {
 
@@ -18,6 +18,8 @@ export default function BlogPosts() {
 
 async function BlogFetch() {
     // await new Promise(res => setTimeout(res, 3000))
+
+    const posts = mockPosts
 
     return <BlogPostsClient posts={[...posts, ...posts, ...posts, ...posts]} />
 }

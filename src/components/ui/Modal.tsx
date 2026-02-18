@@ -1,6 +1,6 @@
 "use client"
 
-import { useStateContext } from "@/app/context/StateContext"
+import { useStateContext } from "@/context/StateContext"
 import { PageCard } from "../containers/Cards"
 import { Button } from "./Button"
 

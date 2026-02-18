@@ -1,6 +1,5 @@
 "use client"
 
-import { useStateContext } from "@/app/context/StateContext";
 import { UserRole } from "@/types/auth";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -10,6 +9,7 @@ import ThemeToggle from "../ui/ThemeToggle";
 import { FaUser } from "react-icons/fa6";
 import { FaUsers, FaBlog, FaBell } from "react-icons/fa";
 import { Logo } from "../ui/Logo";
+import { useStateContext } from "@/context/StateContext";
 
 type NavLink = {
     title: string

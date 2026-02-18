@@ -1,6 +1,6 @@
 import { Post } from "@/types/post";
 
-export const posts: Post[] = [
+export const mockPosts: Post[] = [
     {
         _id: "1",
         title: "Getting Started with Modern React Development",

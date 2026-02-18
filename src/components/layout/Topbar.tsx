@@ -1,6 +1,6 @@
 "use client"
 
-import { useStateContext } from "@/app/context/StateContext"
+import { useStateContext } from "@/context/StateContext"
 import UserButton from "@/components/ui/UserButton"
 import { CgClose } from "react-icons/cg"
 import { FiMenu } from "react-icons/fi"

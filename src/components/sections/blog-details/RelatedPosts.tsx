@@ -1,4 +1,4 @@
-import { posts } from "@/temp/postsData"
+import { mockPosts } from "@/temp/postsData"
 import { FeaturedPostCard } from "@/components/posts/PostCard"
 import { Button } from "@/components/ui/Button"
 import Link from "next/link"
@@ -27,7 +27,7 @@ async function FetchedRelatedPosts({ id }: { id: string }) {
 
     await new Promise(res => setTimeout(res, 2000))
 
-    const relatedPosts = posts
+    const relatedPosts = mockPosts
 
     return (
         <>

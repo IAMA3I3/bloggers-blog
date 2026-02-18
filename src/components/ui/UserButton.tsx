@@ -1,6 +1,6 @@
 "use client"
 
-import { useStateContext } from "@/app/context/StateContext";
+import { useStateContext } from "@/context/StateContext";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react"
 import { FaAngleDown, FaUser } from "react-icons/fa6";
