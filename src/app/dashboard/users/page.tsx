@@ -20,7 +20,7 @@ function SkeletonLoading() {
     return (
         <div className=" space-y-4">
             {
-                [1,2,3,4,5].map(i => (
+                [1, 2, 3, 4, 5].map(i => (
                     <div key={i} className=" p-5 rounded-xl relative overflow-hidden border border-border backdrop-blur-sm shadow-lg dark:shadow-black/50 group">
                         {/* Shimmer effect overlay */}
                         <div className="absolute inset-0">

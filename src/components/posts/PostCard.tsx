@@ -13,6 +13,7 @@ import { BasicCard } from "../containers/Cards"
 import { HeartTick } from "../ui/Ticks"
 import Link from "next/link";
 import { formatPostDate } from "@/utils/formatPostDate";
+import { defaultMedia } from "@/utils/appStore";
 
 export const HeroPostCard = ({ category, title, content }: HeroPostCardProps) => {
 
@@ -47,14 +48,6 @@ type FeaturedPostCardProps = {
     content: string
     authorName: string
     createdAt: Date
-}
-
-const defaultMedia: PostMedia = {
-    url: "/assets/3d-logo.png",
-    type: "image",
-    filename: "Bloggers Blog",
-    size: 986000,
-    uploadedAt: new Date()
 }
 
 export const FeaturedPostCard = ({ variant = "primary", category, media = [defaultMedia], id, title, content, authorName, createdAt }: FeaturedPostCardProps) => {

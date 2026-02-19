@@ -22,7 +22,7 @@ export const Footer = () => {
                         <div className=" mt-6 text-xs font-semibold flex flex-col items-start gap-3">
                             <Link href={"/"} className=" text-gray-300 hover:text-primary">Home</Link>
                             <Link href={"/blog"} className=" text-gray-300 hover:text-primary">Blog</Link>
-                            <Link href={"/dasboard"} className=" text-gray-300 hover:text-primary">Dashboard</Link>
+                            <Link href={"/dashboard"} className=" text-gray-300 hover:text-primary">Dashboard</Link>
                             <Link href={"/sign-in"} className=" text-gray-300 hover:text-primary">Sign In</Link>
                             <Link href={"/sign-up"} className=" text-gray-300 hover:text-primary">Sign Up</Link>
                         </div>
