@@ -27,11 +27,17 @@ export default function UserButton({ from }: UserButtonProps) {
     }
 
     const openLogoutModal = () => {
-        setModalProps(prev => ({
-            ...prev,
+        setModalProps({
             title: "Logout",
-            text: "Proceed to logout"
-        }))
+            text: "Proceed to logout",
+            proceed: {
+                text: "Proceed",
+                onProceed: () => {
+                    console.log("Logged Out")
+                    setIsModalOpen(false)
+                }
+            }
+        })
         setIsModalOpen(true)
     }
 

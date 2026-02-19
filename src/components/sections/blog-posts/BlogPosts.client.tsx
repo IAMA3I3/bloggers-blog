@@ -1,7 +1,6 @@
 "use client"
 
 import { Post } from "@/types/post"
-import { useState } from "react"
 import { FeaturedPostCard } from "@/components/posts/PostCard"
 import Pagination from "@/components/ui/Pagination"
 import { useRouter, useSearchParams } from "next/navigation"
