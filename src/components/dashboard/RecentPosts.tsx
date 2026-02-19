@@ -49,7 +49,7 @@ function SkeletonLoading() {
         <div className=" space-y-2">
             {
                 [1, 2, 3].map(i => (
-                    <div className="block relative overflow-hidden py-2 px-4 bg-gray-100 dark:bg-slate-700 text-xs font-semibold rounded hover:bg-primary/20 hover:text-primary">
+                    <div key={i} className="block relative overflow-hidden py-2 px-4 bg-gray-100 dark:bg-slate-700 text-xs font-semibold rounded hover:bg-primary/20 hover:text-primary">
                         {/* Shimmer effect overlay */}
                         <div className="absolute inset-0">
                             <div className="absolute inset-0 -translate-x-full animate-shimmer">

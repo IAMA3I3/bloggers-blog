@@ -29,9 +29,10 @@ type PageCardProps = React.HTMLAttributes<HTMLDivElement> & {
     fullHeight?: boolean
     centerAlign?: boolean
     scaleDown?: boolean
+    scrollable?: boolean
 }
 
-export const PageCard = ({ children, fullWidth = false, fullHeight = false, centerAlign = false, scaleDown = false, ...rest }: PageCardProps) => {
+export const PageCard = ({ children, fullWidth = false, fullHeight = false, centerAlign = false, scaleDown = false, scrollable = false, ...rest }: PageCardProps) => {
 
     return (
         <div
@@ -45,7 +46,7 @@ export const PageCard = ({ children, fullWidth = false, fullHeight = false, cent
                 w-full p-6 rounded-lg shadow-lg bg-white dark:bg-slate-900 border-2 border-gray-100 dark:border-slate-800 dark:shadow-black/70 backdrop-blur-md
             `}
         >
-            <div className=" w-full h-full overflow-y-auto">
+            <div className={`${scrollable && " overflow-y-auto"} w-full h-full`}>
                 {children}
             </div>
         </div>

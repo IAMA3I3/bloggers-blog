@@ -60,7 +60,7 @@ export const DropSelectMenu = ({ direction = "to-bottom", position = "end", valu
 
     return (
         <div className=" relative w-full">
-            <button ref={buttonRef} onClick={toggleDropMenu} className=" relative w-full">
+            <button ref={buttonRef} type="button" onClick={toggleDropMenu} className=" relative w-full">
                 <input
                     type="text"
                     readOnly
@@ -87,8 +87,12 @@ export const DropSelectMenu = ({ direction = "to-bottom", position = "end", valu
                         menuItems.map(item => (
                             <button
                                 key={item}
+                                type="button"
                                 onClick={() => handleMenuItemClick(item)}
-                                className=" block text-left w-full py-2 px-4 bg-gray-100 dark:bg-slate-700 text-xs font-semibold rounded cursor-pointer hover:bg-primary/20 hover:text-primary"
+                                className={`
+                                    ${value === item ? " bg-primary/20 text-primary" : " bg-gray-100 dark:bg-slate-700 hover:bg-primary/20 hover:text-primary"}
+                                    block text-left w-full py-2 px-4 text-xs font-semibold rounded cursor-pointer
+                                `}
                             >
                                 {dashedToCapitalized(item)}
                             </button>

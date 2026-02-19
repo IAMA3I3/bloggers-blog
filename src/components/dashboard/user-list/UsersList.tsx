@@ -3,7 +3,7 @@ import UsersListClient from "./UsersList.client"
 
 export default async function UsersList() {
 
-    await new Promise(res => setTimeout(res, 5000))
+    await new Promise(res => setTimeout(res, 2000))
 
     const users = mockUsers
 
