@@ -51,7 +51,7 @@ export default function UsersListClient({ users }: UsersListClientProps) {
                         mutedText={user.role}
                         mainText={user.username}
                         contentText={user.email}
-                        actionButton={{ action: "EDIT", href: `/users/${user._id}` }}
+                        actionButton={{ action: "EDIT", href: `/dashboard/users/${user._id}` }}
                         deleteAction={{ for: "USERS", id: user._id }}
                     />
                 ))
