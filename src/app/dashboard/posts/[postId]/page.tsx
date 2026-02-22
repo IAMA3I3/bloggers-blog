@@ -31,7 +31,7 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
                     />
                 </Link>
                 {/* delete button */}
-                <DeleteButton />
+                <DeleteButton id={postId} />
             </div>
         </>
     )
