@@ -1,13 +1,20 @@
 import PostsList from "@/components/dashboard/posts-list/PostsList";
+import { Button } from "@/components/ui/Button";
+import Link from "next/link";
 import { Suspense } from "react";
 
 export default function PostsPage() {
 
     return (
         <>
-            <h2 className="text-2xl font-semibold mb-6">
-                Posts
-            </h2>
+            <div className=" flex gap-4 mb-6 flex-col sm:flex-row sm:items-center sm:justify-between">
+                <h2 className="text-2xl font-semibold">
+                    Posts
+                </h2>
+                <Link href={"/dashboard/posts/create"}>
+                    <Button text="Create post" />
+                </Link>
+            </div>
             {/* posts lists */}
             <Suspense fallback={<SkeletonLoading />}>
                 <PostsList />
