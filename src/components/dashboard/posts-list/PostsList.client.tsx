@@ -43,6 +43,8 @@ export default function PostsListClient({ posts }: PostsListClientProps) {
         })
     }, [currentPage])
 
+    if (currentPosts.length === 0) return <h3 className=" mt-4 text-3xl font-semibold text-center text-gray-400">No post yet</h3>
+
     return (
         <div className=" space-y-4">
             {

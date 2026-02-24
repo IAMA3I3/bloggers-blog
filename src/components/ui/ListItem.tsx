@@ -48,9 +48,13 @@ type ActionListItemProps = {
         for: "USERS" | "POSTS"
         id: string
     }
+    status?: {
+        variant: "primary" | "secondary" | "success" | "info" | "error"
+        text: string
+    }
 }
 
-export const ActionListItem = ({ media, mutedText, mainText, contentText, href, actionButton, deleteAction }: ActionListItemProps) => {
+export const ActionListItem = ({ media, mutedText, mainText, contentText, href, actionButton, deleteAction, status }: ActionListItemProps) => {
 
     const { setIsModalOpen, setModalProps } = useStateContext()
 
@@ -72,6 +76,32 @@ export const ActionListItem = ({ media, mutedText, mainText, contentText, href, 
     return (
         <BasicCard hoverEffect noBackground noPadding={!!media}>
             <div className=" flex flex-col md:flex-row gap-4 items-center">
+                {
+                    status && (
+                        <div className=" absolute top-2 right-2 flex gap-2 items-center">
+                            <div
+                                className={`
+                                    ${status.variant === "primary" && " bg-primary"}
+                                    ${status.variant === "secondary" && " bg-gray-400"}
+                                    ${status.variant === "success" && " bg-green-500"}
+                                    ${status.variant === "info" && " bg-yellow-500"}
+                                    ${status.variant === "error" && " bg-red-500"}
+                                    w-2 aspect-square rounded-full
+                                `}
+                            ></div>
+                            <p
+                                className={`
+                                    ${status.variant === "primary" && " text-primary"}
+                                    ${status.variant === "secondary" && " text-gray-400"}
+                                    ${status.variant === "success" && " text-green-500"}
+                                    ${status.variant === "info" && " text-yellow-500"}
+                                    ${status.variant === "error" && " text-red-500"}
+                                    text-xs font-semibold
+                                `}
+                            >{status.text}</p>
+                        </div>
+                    )
+                }
                 {
                     media && (
                         <div className=" w-full md:w-25 h-25 overflow-hidden">
