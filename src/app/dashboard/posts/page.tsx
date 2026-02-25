@@ -1,4 +1,5 @@
 import PostsList from "@/components/dashboard/posts-list/PostsList";
+import PostsFilter from "@/components/dashboard/PostsFilter";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -15,6 +16,8 @@ export default function PostsPage() {
                     <Button text="Create post" />
                 </Link>
             </div>
+            {/* posts filter */}
+            <PostsFilter />
             {/* posts lists */}
             <Suspense fallback={<SkeletonLoading />}>
                 <PostsList />

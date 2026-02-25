@@ -78,7 +78,7 @@ export const ActionListItem = ({ media, mutedText, mainText, contentText, href, 
             <div className=" flex flex-col md:flex-row gap-4 items-center">
                 {
                     status && (
-                        <div className=" absolute top-2 right-2 flex gap-2 items-center">
+                        <div className=" absolute top-2 right-2 flex gap-2 items-center py-1 px-3 rounded-lg backdrop-blur-lg z-50">
                             <div
                                 className={`
                                     ${status.variant === "primary" && " bg-primary"}

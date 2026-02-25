@@ -58,6 +58,10 @@ export default function PostsListClient({ posts }: PostsListClientProps) {
                         href={`/dashboard/posts/${post._id}`}
                         actionButton={{ action: "EDIT", href: `/dashboard/posts/${post._id}/edit` }}
                         deleteAction={{ for: "POSTS", id: post._id }}
+                        status={{
+                            variant: post.status === "published" ? "success" : "info",
+                            text: post.status === "published" ? "Published" : "Draft"
+                        }}
                     />
                 ))
             }

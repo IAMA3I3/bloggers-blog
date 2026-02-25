@@ -24,6 +24,7 @@ export type Post = {
     category: PostCategory
     featured: boolean
     media: PostMedia[] // Array of media files
+    status: "published" | "draft"
     createdAt: Date
     updatedAt: Date
 }
