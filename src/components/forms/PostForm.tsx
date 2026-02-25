@@ -1,8 +1,10 @@
 "use client"
 
 import { PostFormData } from "@/types/post"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Input } from "../ui/Input"
+import RichTextEditor from "@/utils/Richtexteditor"
+import { MediaInput } from "../ui/MediaInput"
 
 type PostFormProps = {
     initialData?: PostFormData
@@ -10,20 +12,30 @@ type PostFormProps = {
 
 const initialFormData: PostFormData = {
     title: "",
-    content: ""
+    content: "",
+    status: "draft"
 }
 
 export default function PostForm({ initialData = initialFormData }: PostFormProps) {
 
     const [data, setData] = useState(initialData)
+    const [richTextContent, setRichTextContent] = useState("")
+    const [images, setImages] = useState<File[]>([])
+
+    useEffect(() => {
+        setData(prev => ({ ...prev, content: richTextContent }))
+    }, [richTextContent])
 
     return (
-        <form>
+        <form className=" w-full space-y-4">
             <Input
                 variant="secondary"
                 label="Title"
                 backgroundColor="bg-white dark:bg-slate-900"
             />
+            <RichTextEditor onChange={setRichTextContent} />
+            <MediaInput variant="single" />
+            <MediaInput variant="multiple" />
         </form>
     )
 }

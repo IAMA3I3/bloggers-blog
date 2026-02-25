@@ -2,6 +2,8 @@ export type PostCategory = "web-development" | "productivity" | "architecture" |
 
 export type MediaType = "image" | "video"
 
+export type PostStatus = "published" | "draft"
+
 export type PostMedia = {
     url: string
     type: MediaType
@@ -14,6 +16,7 @@ export type PostFormData = {
     title: string
     content: string
     media?: File[]
+    status: PostStatus
 }
 
 export type Post = {
@@ -24,7 +27,7 @@ export type Post = {
     category: PostCategory
     featured: boolean
     media: PostMedia[] // Array of media files
-    status: "published" | "draft"
+    status: PostStatus
     createdAt: Date
     updatedAt: Date
 }

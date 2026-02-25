@@ -150,6 +150,7 @@ const mockPost: Post = {
     userId: "user-1",
     category: "web-development",
     featured: true,
+    status: "published",
     media: [
         {
             url: "https://picsum.photos/1200/700",
