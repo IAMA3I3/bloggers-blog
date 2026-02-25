@@ -100,7 +100,7 @@ export default function SignUpForm() {
                     <Button isLoading={isLoading} type="submit" text="REGISTER" size="large" rounded />
                 </div>
                 <p className=" text-sm font-semibold text-muted text-center">Already have an account? <Link href={"/sign-in"} className=" text-primary hover:underline">Login</Link></p>
-                <p className=" text-xs text-muted text-center">By registering you agree to our <Link href={"/terms"} className=" underline">terms & conditions</Link></p>
+                <p className=" text-xs text-muted text-center">By registering you agree to our <Link href={"/terms"} className=" underline hover:text-primary">terms & conditions</Link></p>
             </form>
         </div>
     )
