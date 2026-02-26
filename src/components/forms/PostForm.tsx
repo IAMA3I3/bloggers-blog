@@ -67,9 +67,9 @@ export default function PostForm({ initialData = initialFormData }: PostFormProp
         setIsLoading(false)
         setError({})
         setData(initialData)
-        setRichTextContent("")
-        setImages([])
-        setRadioValue(initialFormData.status)
+        setRichTextContent(initialData.content)
+        setImages(initialData.media)
+        setRadioValue(initialData.status)
         toast.success(data.status === "draft" ? "Saved as draft" : "Published")
         router.replace('/dashboard/posts/postId')
     }

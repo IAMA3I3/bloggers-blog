@@ -26,6 +26,10 @@ export type SignInFormData = {
     password: string
 }
 
+export type EditProfileFormData = {
+    username: string
+}
+
 export type User = {
     _id: string
     username: string
