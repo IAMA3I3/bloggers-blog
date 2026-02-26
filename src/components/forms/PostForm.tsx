@@ -31,9 +31,9 @@ export default function PostForm({ initialData = initialFormData }: PostFormProp
     const router = useRouter()
 
     const [data, setData] = useState(initialData)
-    const [richTextContent, setRichTextContent] = useState("")
-    const [images, setImages] = useState<File[] | undefined>()
-    const [radioValue, setRadioValue] = useState<PostStatus>(initialFormData.status)
+    const [richTextContent, setRichTextContent] = useState(initialData.content)
+    const [images, setImages] = useState<File[] | undefined>(initialData.media)
+    const [radioValue, setRadioValue] = useState<PostStatus>(initialData.status)
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState<PostFormError>({})
 
@@ -52,7 +52,7 @@ export default function PostForm({ initialData = initialFormData }: PostFormProp
     const onFormSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         setIsLoading(true)
-        
+
         const { isValid, errors } = validatePost(data)
 
         if (!isValid) {
@@ -71,7 +71,7 @@ export default function PostForm({ initialData = initialFormData }: PostFormProp
         setImages([])
         setRadioValue(initialFormData.status)
         toast.success(data.status === "draft" ? "Saved as draft" : "Published")
-        router.replace('/dashboard/posts')
+        router.replace('/dashboard/posts/postId')
     }
 
     return (
@@ -84,7 +84,7 @@ export default function PostForm({ initialData = initialFormData }: PostFormProp
                 onChange={(e) => setData(prev => ({ ...prev, title: e.target.value }))}
                 error={error.title}
             />
-            <RichTextEditor onChange={setRichTextContent} error={error.content} />
+            <RichTextEditor initialContent={richTextContent} onChange={setRichTextContent} error={error.content} />
             <MediaInput variant="multiple" id="multiple" media={images} setMedia={setImages} error={error.media} />
             <RadioInput
                 value={radioValue}
