@@ -9,12 +9,14 @@ type MediaInputType = {
     mediaType?: "image" | "video" | "mixed"
     media?: File
     setMedia?: Dispatch<SetStateAction<File | undefined>>
+    error?: string
 } | {
     variant: "multiple"
     id: string
     mediaType?: "image" | "video" | "mixed"
     media?: File[]
     setMedia?: Dispatch<SetStateAction<File[] | undefined>>
+    error?: string
 }
 
 type PreviewEntry = { file: File; url: string }
@@ -46,7 +48,7 @@ function MediaPreview({ url, file, onRemove }: { url: string; file: File; onRemo
     )
 }
 
-export function MediaInput({ variant, id, mediaType = "mixed", media, setMedia }: MediaInputType) {
+export function MediaInput({ variant, id, mediaType = "mixed", media, setMedia, error }: MediaInputType) {
     const inputRef = useRef<HTMLInputElement>(null)
     const accept = getAccept(mediaType)
     const [previews, setPreviews] = useState<PreviewEntry[]>([])
@@ -89,47 +91,61 @@ export function MediaInput({ variant, id, mediaType = "mixed", media, setMedia }
     }
 
     return (
-        <div
-            className={`
+        <div>
+            <div
+                className={`
                 ${variant === "single" ? "sm:flex-row items-center" : "items-center"}
                 w-full flex flex-col flex-wrap gap-4 overflow-hidden
             `}
-        >
-            <div
-                className={`
+            >
+                <div
+                    className={`
                     ${variant === "single" ? "w-24" : "w-full pb-2 flex gap-2 flex-nowrap overflow-x-auto"}
                     h-24 rounded-lg border-2 border-border p-2 relative
                 `}
-            >
-                {previews.length === 0 && <p className=" text-xs font-semibold text-muted absolute top-[50%] -translate-y-[50%] left-[50%] -translate-x-[50%] text-center">Media preview</p>}
-                {previews.map((entry, i) => (
-                    <MediaPreview
-                        key={entry.url}
-                        url={entry.url}
-                        file={entry.file}
-                        onRemove={() => removeAt(i)}
-                    />
-                ))}
-            </div>
-
-            <div className="flex-1 flex">
-                <input
-                    ref={inputRef}
-                    type="file"
-                    id={id}
-                    accept={accept}
-                    multiple={variant === "multiple"}
-                    className="hidden"
-                    onChange={handleChange}
-                />
-                <label
-                    htmlFor={id}
-                    className="flex *:flex-none items-center gap-2 py-2 px-4 rounded-lg text-sm font-semibold border-2 border-primary text-primary hover:bg-primary hover:text-white cursor-pointer"
                 >
-                    <span>Upload Media</span>
-                    <FiUpload />
-                </label>
+                    {previews.length === 0 && <p className=" text-xs font-semibold text-muted absolute top-[50%] -translate-y-[50%] left-[50%] -translate-x-[50%] text-center">Media preview</p>}
+                    {previews.map((entry, i) => (
+                        <MediaPreview
+                            key={entry.url}
+                            url={entry.url}
+                            file={entry.file}
+                            onRemove={() => removeAt(i)}
+                        />
+                    ))}
+                </div>
+
+                <div className="flex-1 flex">
+                    <input
+                        ref={inputRef}
+                        type="file"
+                        id={id}
+                        accept={accept}
+                        multiple={variant === "multiple"}
+                        className="hidden"
+                        onChange={handleChange}
+                    />
+                    <label
+                        htmlFor={id}
+                        className="flex *:flex-none items-center gap-2 py-2 px-4 rounded-lg text-sm font-semibold border-2 border-primary text-primary hover:bg-primary hover:text-white cursor-pointer"
+                    >
+                        <span>Upload Media</span>
+                        <FiUpload />
+                    </label>
+                </div>
             </div>
+            {
+                error && (
+                    <p
+                        className={`
+                            ${variant === "single" ? " sm:text-left" : ""}
+                            text-sm font-semibold text-red-400 text-center
+                        `}
+                    >
+                        {error}
+                    </p>
+                )
+            }
         </div>
     )
 }

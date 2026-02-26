@@ -1,7 +1,7 @@
 "use client"
 
 import { PostFormData, PostStatus } from "@/types/post"
-import { ChangeEvent, Dispatch, FormEvent, SetStateAction, useEffect, useState } from "react"
+import { Dispatch, FormEvent, SetStateAction, useEffect, useState } from "react"
 import { Input } from "../ui/Input"
 import RichTextEditor from "@/utils/Richtexteditor"
 import { MediaInput } from "../ui/MediaInput"
@@ -52,7 +52,7 @@ export default function PostForm({ initialData = initialFormData }: PostFormProp
     const onFormSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         setIsLoading(true)
-
+        
         const { isValid, errors } = validatePost(data)
 
         if (!isValid) {
@@ -84,8 +84,8 @@ export default function PostForm({ initialData = initialFormData }: PostFormProp
                 onChange={(e) => setData(prev => ({ ...prev, title: e.target.value }))}
                 error={error.title}
             />
-            <RichTextEditor onChange={setRichTextContent} />
-            <MediaInput variant="multiple" id="multiple" media={images} setMedia={setImages} />
+            <RichTextEditor onChange={setRichTextContent} error={error.content} />
+            <MediaInput variant="multiple" id="multiple" media={images} setMedia={setImages} error={error.media} />
             <RadioInput
                 value={radioValue}
                 setValue={setRadioValue as Dispatch<SetStateAction<string>>}

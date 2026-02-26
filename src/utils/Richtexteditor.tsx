@@ -75,8 +75,8 @@ const ToolbarButton = ({
         disabled={disabled}
         title={title}
         className={`p-1.5 rounded transition-all duration-150 ${active
-                ? 'bg-slate-700 text-white dark:bg-slate-200 dark:text-slate-900'
-                : 'text-slate-600 hover:bg-slate-200 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-100'
+            ? 'bg-slate-700 text-white dark:bg-slate-200 dark:text-slate-900'
+            : 'text-slate-600 hover:bg-slate-200 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-100'
             } ${disabled ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'}`}
     >
         {children}
@@ -157,8 +157,8 @@ function FloatingBubble({ editor }: { editor: ReturnType<typeof useEditor> }) {
                     type="button"
                     onMouseDown={(e) => { e.preventDefault(); fn(); }}
                     className={`text-xs w-6 h-6 flex items-center justify-center rounded ${cls} transition-colors ${active
-                            ? 'bg-white text-slate-900 dark:bg-slate-900 dark:text-white'
-                            : 'text-slate-300 hover:text-white dark:text-slate-600 dark:hover:text-slate-900'
+                        ? 'bg-white text-slate-900 dark:bg-slate-900 dark:text-white'
+                        : 'text-slate-300 hover:text-white dark:text-slate-600 dark:hover:text-slate-900'
                         }`}
                 >
                     {label}
@@ -173,12 +173,14 @@ interface RichTextEditorProps {
     initialContent?: string;
     onChange?: (html: string) => void;
     placeholder?: string;
+    error?: string
 }
 
 export default function RichTextEditor({
     initialContent = '',
     onChange,
     placeholder = 'Start writing your blog post...',
+    error
 }: RichTextEditorProps) {
     const [linkUrl, setLinkUrl] = useState('');
     const [showLinkInput, setShowLinkInput] = useState(false);
@@ -255,189 +257,196 @@ export default function RichTextEditor({
     const dropdownItemClass = 'block w-full text-left px-3 py-1 text-sm hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300';
 
     return (
-        <div className="rich-editor-wrapper relative border border-slate-200 dark:border-slate-700 rounded-xl overflow-visible shadow-sm bg-white dark:bg-slate-900">
+        <div>
+            <div className="rich-editor-wrapper relative border border-slate-200 dark:border-slate-700 rounded-xl overflow-visible shadow-sm bg-white dark:bg-slate-900">
 
-            <FloatingBubble editor={editor} />
+                <FloatingBubble editor={editor} />
 
-            {/* ── Toolbar ── */}
-            <div className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 flex flex-wrap items-center gap-0.5 rounded-t-xl">
+                {/* ── Toolbar ── */}
+                <div className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 flex flex-wrap items-center gap-0.5 rounded-t-xl">
 
-                {/* Heading */}
-                <select
-                    className="text-sm text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded px-2 py-1 mr-1 focus:outline-none focus:border-slate-400 dark:focus:border-slate-500 cursor-pointer"
-                    value={
-                        editor.isActive('heading', { level: 1 }) ? 'h1' :
-                            editor.isActive('heading', { level: 2 }) ? 'h2' :
-                                editor.isActive('heading', { level: 3 }) ? 'h3' : 'p'
-                    }
-                    onChange={(e) => {
-                        const val = e.target.value;
-                        if (val === 'p') editor.chain().focus().setParagraph().run();
-                        else editor.chain().focus().setHeading({ level: parseInt(val[1]) as 1 | 2 | 3 }).run();
-                    }}
-                >
-                    <option value="p">Paragraph</option>
-                    <option value="h1">Heading 1</option>
-                    <option value="h2">Heading 2</option>
-                    <option value="h3">Heading 3</option>
-                </select>
-
-                {/* Font size */}
-                <div className="relative mr-1">
-                    <button
-                        type="button"
-                        onMouseDown={(e) => { e.preventDefault(); setShowFontSizes(!showFontSizes); setShowColorPicker(false); }}
-                        className="text-sm text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded px-2 py-1 hover:bg-slate-100 dark:hover:bg-slate-600 flex items-center gap-1"
+                    {/* Heading */}
+                    <select
+                        className="text-sm text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded px-2 py-1 mr-1 focus:outline-none focus:border-slate-400 dark:focus:border-slate-500 cursor-pointer"
+                        value={
+                            editor.isActive('heading', { level: 1 }) ? 'h1' :
+                                editor.isActive('heading', { level: 2 }) ? 'h2' :
+                                    editor.isActive('heading', { level: 3 }) ? 'h3' : 'p'
+                        }
+                        onChange={(e) => {
+                            const val = e.target.value;
+                            if (val === 'p') editor.chain().focus().setParagraph().run();
+                            else editor.chain().focus().setHeading({ level: parseInt(val[1]) as 1 | 2 | 3 }).run();
+                        }}
                     >
-                        Size
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9" /></svg>
-                    </button>
-                    {showFontSizes && (
-                        <div className={`${dropdownClass} py-1 min-w-[90px]`}>
-                            <button
-                                type="button"
-                                onMouseDown={(e) => { e.preventDefault(); (editor.chain().focus() as any).unsetFontSize().run(); setShowFontSizes(false); }}
-                                className="block w-full text-left px-3 py-1 text-xs text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700 border-b border-slate-100 dark:border-slate-700"
-                            >
-                                Default
-                            </button>
-                            {FONT_SIZES.map((size) => (
+                        <option value="p">Paragraph</option>
+                        <option value="h1">Heading 1</option>
+                        <option value="h2">Heading 2</option>
+                        <option value="h3">Heading 3</option>
+                    </select>
+
+                    {/* Font size */}
+                    <div className="relative mr-1">
+                        <button
+                            type="button"
+                            onMouseDown={(e) => { e.preventDefault(); setShowFontSizes(!showFontSizes); setShowColorPicker(false); }}
+                            className="text-sm text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded px-2 py-1 hover:bg-slate-100 dark:hover:bg-slate-600 flex items-center gap-1"
+                        >
+                            Size
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9" /></svg>
+                        </button>
+                        {showFontSizes && (
+                            <div className={`${dropdownClass} py-1 min-w-22.5`}>
                                 <button
-                                    key={size}
                                     type="button"
-                                    onMouseDown={(e) => { e.preventDefault(); (editor.chain().focus() as any).setFontSize(size).run(); setShowFontSizes(false); }}
-                                    className={dropdownItemClass}
-                                    style={{ fontSize: size }}
+                                    onMouseDown={(e) => { e.preventDefault(); (editor.chain().focus() as any).unsetFontSize().run(); setShowFontSizes(false); }}
+                                    className="block w-full text-left px-3 py-1 text-xs text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700 border-b border-slate-100 dark:border-slate-700"
                                 >
-                                    {size}
+                                    Default
                                 </button>
-                            ))}
-                        </div>
-                    )}
-                </div>
-
-                <Divider />
-
-                {/* Formatting */}
-                <ToolbarButton onClick={() => editor.chain().focus().toggleBold().run()} active={editor.isActive('bold')} title="Bold (Ctrl+B)"><BoldIcon /></ToolbarButton>
-                <ToolbarButton onClick={() => editor.chain().focus().toggleItalic().run()} active={editor.isActive('italic')} title="Italic (Ctrl+I)"><ItalicIcon /></ToolbarButton>
-                <ToolbarButton onClick={() => editor.chain().focus().toggleUnderline().run()} active={editor.isActive('underline')} title="Underline (Ctrl+U)"><UnderlineIcon /></ToolbarButton>
-                <ToolbarButton onClick={() => editor.chain().focus().toggleStrike().run()} active={editor.isActive('strike')} title="Strikethrough"><StrikeIcon /></ToolbarButton>
-                <ToolbarButton onClick={() => editor.chain().focus().toggleCode().run()} active={editor.isActive('code')} title="Inline code"><CodeIcon /></ToolbarButton>
-
-                <Divider />
-
-                {/* Text color */}
-                <div className="relative">
-                    <button
-                        type="button"
-                        onMouseDown={(e) => { e.preventDefault(); setShowColorPicker(!showColorPicker); setShowFontSizes(false); }}
-                        title="Text color"
-                        className="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors flex flex-col items-center gap-0.5"
-                    >
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-slate-600 dark:text-slate-400">
-                            <polyline points="4 7 4 4 20 4 20 7" /><line x1="9" y1="20" x2="15" y2="20" /><line x1="12" y1="4" x2="12" y2="20" />
-                        </svg>
-                        <div className="w-4 h-1 rounded-full border border-slate-300 dark:border-slate-600" style={{ backgroundColor: currentColor }} />
-                    </button>
-                    {showColorPicker && (
-                        <div className={`${dropdownClass} p-3`}>
-                            <div className="grid grid-cols-4 gap-2 mb-2">
-                                {COLORS.map((color) => (
+                                {FONT_SIZES.map((size) => (
                                     <button
-                                        key={color}
+                                        key={size}
                                         type="button"
-                                        onMouseDown={(e) => {
-                                            e.preventDefault();
-                                            // setMark persists color for newly typed text; setColor alone only marks selected text
-                                            editor.chain().focus().setMark('textStyle', { color }).run();
-                                            setShowColorPicker(false);
-                                        }}
-                                        className="w-6 h-6 rounded-full border-2 hover:scale-110 transition-transform"
-                                        style={{ backgroundColor: color, borderColor: currentColor === color ? '#3B82F6' : '#e2e8f0' }}
-                                        title={color}
-                                    />
+                                        onMouseDown={(e) => { e.preventDefault(); (editor.chain().focus() as any).setFontSize(size).run(); setShowFontSizes(false); }}
+                                        className={dropdownItemClass}
+                                        style={{ fontSize: size }}
+                                    >
+                                        {size}
+                                    </button>
                                 ))}
                             </div>
-                            <button
-                                type="button"
-                                onMouseDown={(e) => {
-                                    e.preventDefault();
-                                    editor.chain().focus().unsetMark('textStyle').run();
-                                    setShowColorPicker(false);
-                                }}
-                                className="text-xs text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 w-full text-center"
-                            >
-                                Reset color
-                            </button>
-                        </div>
-                    )}
+                        )}
+                    </div>
+
+                    <Divider />
+
+                    {/* Formatting */}
+                    <ToolbarButton onClick={() => editor.chain().focus().toggleBold().run()} active={editor.isActive('bold')} title="Bold (Ctrl+B)"><BoldIcon /></ToolbarButton>
+                    <ToolbarButton onClick={() => editor.chain().focus().toggleItalic().run()} active={editor.isActive('italic')} title="Italic (Ctrl+I)"><ItalicIcon /></ToolbarButton>
+                    <ToolbarButton onClick={() => editor.chain().focus().toggleUnderline().run()} active={editor.isActive('underline')} title="Underline (Ctrl+U)"><UnderlineIcon /></ToolbarButton>
+                    <ToolbarButton onClick={() => editor.chain().focus().toggleStrike().run()} active={editor.isActive('strike')} title="Strikethrough"><StrikeIcon /></ToolbarButton>
+                    <ToolbarButton onClick={() => editor.chain().focus().toggleCode().run()} active={editor.isActive('code')} title="Inline code"><CodeIcon /></ToolbarButton>
+
+                    <Divider />
+
+                    {/* Text color */}
+                    <div className="relative">
+                        <button
+                            type="button"
+                            onMouseDown={(e) => { e.preventDefault(); setShowColorPicker(!showColorPicker); setShowFontSizes(false); }}
+                            title="Text color"
+                            className="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors flex flex-col items-center gap-0.5"
+                        >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-slate-600 dark:text-slate-400">
+                                <polyline points="4 7 4 4 20 4 20 7" /><line x1="9" y1="20" x2="15" y2="20" /><line x1="12" y1="4" x2="12" y2="20" />
+                            </svg>
+                            <div className="w-4 h-1 rounded-full border border-slate-300 dark:border-slate-600" style={{ backgroundColor: currentColor }} />
+                        </button>
+                        {showColorPicker && (
+                            <div className={`${dropdownClass} p-3`}>
+                                <div className="grid grid-cols-4 gap-2 mb-2">
+                                    {COLORS.map((color) => (
+                                        <button
+                                            key={color}
+                                            type="button"
+                                            onMouseDown={(e) => {
+                                                e.preventDefault();
+                                                // setMark persists color for newly typed text; setColor alone only marks selected text
+                                                editor.chain().focus().setMark('textStyle', { color }).run();
+                                                setShowColorPicker(false);
+                                            }}
+                                            className="w-6 h-6 rounded-full border-2 hover:scale-110 transition-transform"
+                                            style={{ backgroundColor: color, borderColor: currentColor === color ? '#3B82F6' : '#e2e8f0' }}
+                                            title={color}
+                                        />
+                                    ))}
+                                </div>
+                                <button
+                                    type="button"
+                                    onMouseDown={(e) => {
+                                        e.preventDefault();
+                                        editor.chain().focus().unsetMark('textStyle').run();
+                                        setShowColorPicker(false);
+                                    }}
+                                    className="text-xs text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 w-full text-center"
+                                >
+                                    Reset color
+                                </button>
+                            </div>
+                        )}
+                    </div>
+
+                    <Divider />
+
+                    {/* Alignment */}
+                    <ToolbarButton onClick={() => editor.chain().focus().setTextAlign('left').run()} active={editor.isActive({ textAlign: 'left' })} title="Align left"><AlignLeftIcon /></ToolbarButton>
+                    <ToolbarButton onClick={() => editor.chain().focus().setTextAlign('center').run()} active={editor.isActive({ textAlign: 'center' })} title="Align center"><AlignCenterIcon /></ToolbarButton>
+                    <ToolbarButton onClick={() => editor.chain().focus().setTextAlign('right').run()} active={editor.isActive({ textAlign: 'right' })} title="Align right"><AlignRightIcon /></ToolbarButton>
+
+                    <Divider />
+
+                    {/* Lists & blocks */}
+                    <ToolbarButton onClick={() => editor.chain().focus().toggleBulletList().run()} active={editor.isActive('bulletList')} title="Bullet list"><ListIcon /></ToolbarButton>
+                    <ToolbarButton onClick={() => editor.chain().focus().toggleOrderedList().run()} active={editor.isActive('orderedList')} title="Numbered list"><OrderedListIcon /></ToolbarButton>
+                    <ToolbarButton onClick={() => editor.chain().focus().toggleBlockquote().run()} active={editor.isActive('blockquote')} title="Blockquote"><QuoteIcon /></ToolbarButton>
+                    <ToolbarButton onClick={() => editor.chain().focus().toggleCodeBlock().run()} active={editor.isActive('codeBlock')} title="Code block"><CodeIcon /></ToolbarButton>
+
+                    <Divider />
+
+                    {/* Link */}
+                    <ToolbarButton
+                        onClick={() => {
+                            if (editor.isActive('link')) { editor.chain().focus().unsetLink().run(); }
+                            else { setShowLinkInput(true); setShowColorPicker(false); setShowFontSizes(false); }
+                        }}
+                        active={editor.isActive('link')}
+                        title="Insert link"
+                    >
+                        <LinkIcon />
+                    </ToolbarButton>
+
+                    <Divider />
+
+                    {/* Undo / Redo */}
+                    <ToolbarButton onClick={() => editor.chain().focus().undo().run()} disabled={!editor.can().undo()} title="Undo (Ctrl+Z)"><UndoIcon /></ToolbarButton>
+                    <ToolbarButton onClick={() => editor.chain().focus().redo().run()} disabled={!editor.can().redo()} title="Redo (Ctrl+Y)"><RedoIcon /></ToolbarButton>
                 </div>
 
-                <Divider />
+                {/* ── Link Input Bar ── */}
+                {showLinkInput && (
+                    <div className="border-b border-slate-200 dark:border-slate-700 bg-blue-50 dark:bg-blue-950 px-4 py-2 flex items-center gap-2">
+                        <span className="text-blue-500 dark:text-blue-400"><LinkIcon /></span>
+                        <input
+                            type="url"
+                            value={linkUrl}
+                            onChange={(e) => setLinkUrl(e.target.value)}
+                            onKeyDown={(e) => { if (e.key === 'Enter') setLink(); if (e.key === 'Escape') setShowLinkInput(false); }}
+                            placeholder="https://example.com"
+                            autoFocus
+                            className="flex-1 text-sm bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 rounded px-3 py-1.5 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+                        />
+                        <button type="button" onClick={setLink} className="text-sm bg-blue-600 dark:bg-blue-500 text-white px-3 py-1.5 rounded hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors">Apply</button>
+                        <button type="button" onClick={() => setShowLinkInput(false)} className="text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 px-2">Cancel</button>
+                    </div>
+                )}
 
-                {/* Alignment */}
-                <ToolbarButton onClick={() => editor.chain().focus().setTextAlign('left').run()} active={editor.isActive({ textAlign: 'left' })} title="Align left"><AlignLeftIcon /></ToolbarButton>
-                <ToolbarButton onClick={() => editor.chain().focus().setTextAlign('center').run()} active={editor.isActive({ textAlign: 'center' })} title="Align center"><AlignCenterIcon /></ToolbarButton>
-                <ToolbarButton onClick={() => editor.chain().focus().setTextAlign('right').run()} active={editor.isActive({ textAlign: 'right' })} title="Align right"><AlignRightIcon /></ToolbarButton>
-
-                <Divider />
-
-                {/* Lists & blocks */}
-                <ToolbarButton onClick={() => editor.chain().focus().toggleBulletList().run()} active={editor.isActive('bulletList')} title="Bullet list"><ListIcon /></ToolbarButton>
-                <ToolbarButton onClick={() => editor.chain().focus().toggleOrderedList().run()} active={editor.isActive('orderedList')} title="Numbered list"><OrderedListIcon /></ToolbarButton>
-                <ToolbarButton onClick={() => editor.chain().focus().toggleBlockquote().run()} active={editor.isActive('blockquote')} title="Blockquote"><QuoteIcon /></ToolbarButton>
-                <ToolbarButton onClick={() => editor.chain().focus().toggleCodeBlock().run()} active={editor.isActive('codeBlock')} title="Code block"><CodeIcon /></ToolbarButton>
-
-                <Divider />
-
-                {/* Link */}
-                <ToolbarButton
-                    onClick={() => {
-                        if (editor.isActive('link')) { editor.chain().focus().unsetLink().run(); }
-                        else { setShowLinkInput(true); setShowColorPicker(false); setShowFontSizes(false); }
-                    }}
-                    active={editor.isActive('link')}
-                    title="Insert link"
-                >
-                    <LinkIcon />
-                </ToolbarButton>
-
-                <Divider />
-
-                {/* Undo / Redo */}
-                <ToolbarButton onClick={() => editor.chain().focus().undo().run()} disabled={!editor.can().undo()} title="Undo (Ctrl+Z)"><UndoIcon /></ToolbarButton>
-                <ToolbarButton onClick={() => editor.chain().focus().redo().run()} disabled={!editor.can().redo()} title="Redo (Ctrl+Y)"><RedoIcon /></ToolbarButton>
-            </div>
-
-            {/* ── Link Input Bar ── */}
-            {showLinkInput && (
-                <div className="border-b border-slate-200 dark:border-slate-700 bg-blue-50 dark:bg-blue-950 px-4 py-2 flex items-center gap-2">
-                    <span className="text-blue-500 dark:text-blue-400"><LinkIcon /></span>
-                    <input
-                        type="url"
-                        value={linkUrl}
-                        onChange={(e) => setLinkUrl(e.target.value)}
-                        onKeyDown={(e) => { if (e.key === 'Enter') setLink(); if (e.key === 'Escape') setShowLinkInput(false); }}
-                        placeholder="https://example.com"
-                        autoFocus
-                        className="flex-1 text-sm bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 rounded px-3 py-1.5 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
-                    />
-                    <button type="button" onClick={setLink} className="text-sm bg-blue-600 dark:bg-blue-500 text-white px-3 py-1.5 rounded hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors">Apply</button>
-                    <button type="button" onClick={() => setShowLinkInput(false)} className="text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 px-2">Cancel</button>
+                {/* ── Editor Area ── */}
+                <div onClick={() => editor.chain().focus().run()} className="cursor-text">
+                    <EditorContent editor={editor} />
                 </div>
-            )}
 
-            {/* ── Editor Area ── */}
-            <div onClick={() => editor.chain().focus().run()} className="cursor-text">
-                <EditorContent editor={editor} />
+                {/* ── Footer ── */}
+                <div className="border-t border-slate-100 dark:border-slate-700 px-5 py-2 flex justify-between bg-slate-50 dark:bg-slate-800 rounded-b-xl">
+                    <span className="text-xs text-slate-400 dark:text-slate-500">{charCount} characters</span>
+                    <span className="text-xs text-slate-400 dark:text-slate-500">Select text for quick formatting</span>
+                </div>
             </div>
-
-            {/* ── Footer ── */}
-            <div className="border-t border-slate-100 dark:border-slate-700 px-5 py-2 flex justify-between bg-slate-50 dark:bg-slate-800 rounded-b-xl">
-                <span className="text-xs text-slate-400 dark:text-slate-500">{charCount} characters</span>
-                <span className="text-xs text-slate-400 dark:text-slate-500">Select text for quick formatting</span>
-            </div>
+            {
+                error && (
+                    <p className=' text-sm font-semibold text-red-400'>{error}</p>
+                )
+            }
         </div>
     );
 }
