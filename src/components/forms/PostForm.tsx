@@ -20,11 +20,19 @@ export default function PostForm({ initialData = initialFormData }: PostFormProp
 
     const [data, setData] = useState(initialData)
     const [richTextContent, setRichTextContent] = useState("")
-    const [images, setImages] = useState<File[]>([])
+    const [images, setImages] = useState<File[] | undefined>()
 
     useEffect(() => {
         setData(prev => ({ ...prev, content: richTextContent }))
     }, [richTextContent])
+
+    useEffect(() => {
+        setData(prev => ({ ...prev, media: images }))
+    }, [images])
+
+    useEffect(() => {
+        console.log(data)
+    }, [data])
 
     return (
         <form className=" w-full space-y-4">
@@ -34,8 +42,7 @@ export default function PostForm({ initialData = initialFormData }: PostFormProp
                 backgroundColor="bg-white dark:bg-slate-900"
             />
             <RichTextEditor onChange={setRichTextContent} />
-            <MediaInput variant="single" />
-            <MediaInput variant="multiple" />
+            <MediaInput variant="multiple" id="multiple" media={images} setMedia={setImages} />
         </form>
     )
 }
