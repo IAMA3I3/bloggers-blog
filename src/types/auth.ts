@@ -30,6 +30,12 @@ export type EditProfileFormData = {
     username: string
 }
 
+export type ChangePasswordFormData = {
+    currentPassword: string
+    newPassword: string
+    confirmPassword: string
+}
+
 export type User = {
     _id: string
     username: string
