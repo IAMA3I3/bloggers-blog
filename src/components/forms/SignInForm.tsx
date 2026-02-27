@@ -72,7 +72,7 @@ export default function () {
                     backgroundColor=" bg-white dark:bg-slate-900"
                     error={error.password || undefined}
                 />
-                <Link href={"/forget-password"} className=" text-sm font-semibold text-muted underline hover:text-primary">Forget Password</Link>
+                <Link href={"/forget-password"} className=" inline-block text-sm font-semibold text-muted underline hover:text-primary">Forget Password</Link>
                 <div className=" flex justify-center">
                     <Button isLoading={isLoading} type="submit" text="LOGIN" size="large" rounded />
                 </div>

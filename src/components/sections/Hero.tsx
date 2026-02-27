@@ -44,7 +44,7 @@ export default function Hero() {
                     </p>
 
                     <div className="mt-8 flex flex-wrap items-center gap-4">
-                        <Link href={"/posts/create"}>
+                        <Link href={"/dashboard/posts/create"}>
                             <Button text="Start Writing" size="large" variant="primary" />
                         </Link>
                         <Link href={"/blog"}>

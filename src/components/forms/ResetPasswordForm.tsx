@@ -66,6 +66,7 @@ export default function ResetPasswordForm() {
                     type="text"
                     name="password"
                     label="Password"
+                    id="password"
                     viewPassword
                     backgroundColor=" bg-white dark:bg-slate-900"
                     error={error.password || undefined}
@@ -77,6 +78,7 @@ export default function ResetPasswordForm() {
                     type="text"
                     name="confirmPassword"
                     label="Confirm Password"
+                    id="confirm-password"
                     viewPassword
                     backgroundColor=" bg-white dark:bg-slate-900"
                     error={error.confirmPassword || undefined}

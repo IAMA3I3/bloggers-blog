@@ -1,11 +1,13 @@
 import DeleteButton from "@/components/dashboard/DeleteButton"
 import BlogMedia from "@/components/sections/blog-posts/BlogMedia"
 import { Button } from "@/components/ui/Button"
+import { HeartTick } from "@/components/ui/Ticks"
 import { Post } from "@/types/post"
 import { formatPostDate } from "@/utils/formatPostDate"
 import { dashedToCapitalized } from "@/utils/textFormat"
 import Link from "next/link"
 import { Suspense } from "react"
+import { BiCommentDetail } from "react-icons/bi"
 import { FaEdit } from "react-icons/fa";
 
 type PostDetailPageProps = {
@@ -66,6 +68,23 @@ async function PostDetailMain({ id }: { id: string }) {
                     className=" prose prose-neutral dark:prose-invert max-w-none"
                     dangerouslySetInnerHTML={{ __html: post.content }}
                 />
+            </section>
+            {/* likes and comments */}
+            <section className=" container mt-12 px-6 mx-auto flex gap-4 flex-wrap">
+                <HeartTick size="large" variant="secondary" label="5" />
+                <div className=" text-3xl text-muted p-2 rounded-lg flex items-center gap-2">
+                    <span><BiCommentDetail /></span>
+                    <span className=" text-2xl">3</span>
+                </div>
+            </section>
+            <section className=" container mb-12 px-6 mx-auto flex gap-4 flex-wrap">
+                {
+                    post.status === "draft" ? (
+                        <p className=" text-muted font-semibold">Post saved as draft</p>
+                    ) : (
+                        <p className=" text-muted font-semibold">Post published: <Link href={`/blog/${post._id}`} className=" text-primary hover:underline">View live</Link></p>
+                    )
+                }
             </section>
         </>
     )
