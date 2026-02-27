@@ -56,6 +56,7 @@ export default function ChangePasswordForm() {
                 value={data.currentPassword}
                 onChange={onInputChange}
                 error={error.currentPassword}
+                id="current-password"
             />
             <Input
                 variant="secondary"
@@ -66,6 +67,7 @@ export default function ChangePasswordForm() {
                 value={data.newPassword}
                 onChange={onInputChange}
                 error={error.newPassword}
+                id="new-password"
             />
             <Input
                 variant="secondary"
@@ -76,6 +78,7 @@ export default function ChangePasswordForm() {
                 value={data.confirmPassword}
                 onChange={onInputChange}
                 error={error.confirmPassword}
+                id="confirm-password"
             />
             <div className=" flex justify-center">
                 <Button

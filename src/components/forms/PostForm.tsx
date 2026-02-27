@@ -83,6 +83,7 @@ export default function PostForm({ initialData = initialFormData }: PostFormProp
                 value={data.title}
                 onChange={(e) => setData(prev => ({ ...prev, title: e.target.value }))}
                 error={error.title}
+                id="title"
             />
             <RichTextEditor initialContent={richTextContent} onChange={setRichTextContent} error={error.content} />
             <MediaInput variant="multiple" id="multiple" media={images} setMedia={setImages} error={error.media} />
