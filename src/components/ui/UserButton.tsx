@@ -40,7 +40,7 @@ export default function UserButton({ from }: UserButtonProps) {
                     await logoutAction()
                     setIsModalOpen(false)
                     toast.success("Logged out")
-                    router.push("/sign-in")
+                    router.push("/")
                 }
             }
         })

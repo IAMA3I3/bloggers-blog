@@ -10,6 +10,7 @@ import { IoCloseOutline } from "react-icons/io5"
 import { FiLogIn } from "react-icons/fi";
 import UserButton from "@/components/ui/UserButton"
 import { Button } from "@/components/ui/Button"
+import { SessionPayload } from "@/lib/sessions"
 
 const navLinks = [
     { name: "Home", href: "/" },
@@ -18,7 +19,11 @@ const navLinks = [
     { name: "Contact", href: "/contact" }
 ]
 
-export default function NavbarClient() {
+type NavbarProps = {
+    authUser: SessionPayload | null
+}
+
+export default function NavbarClient({ authUser }: NavbarProps) {
 
     const pathname = usePathname()
 
@@ -78,10 +83,15 @@ export default function NavbarClient() {
                             })
                         }
                         <ThemeToggle />
-                        <Link href={"/sign-in"} className=" p-2 rounded-lg hover:bg-gray-300 dark:hover:bg-slate-800 transition-colors text-2xl hover:text-primary">
-                            <FiLogIn />
-                        </Link>
-                        {/* <UserButton from="MAIN" /> */}
+                        {
+                            authUser ? (
+                                <UserButton from="MAIN" />
+                            ) : (
+                                <Link href={"/sign-in"} className=" p-2 rounded-lg hover:bg-gray-300 dark:hover:bg-slate-800 transition-colors text-2xl hover:text-primary">
+                                    <FiLogIn />
+                                </Link>
+                            )
+                        }
                     </div>
 
                     {/* Mobile Menu Button */}
@@ -107,10 +117,15 @@ export default function NavbarClient() {
                     <ThemeToggle />
                 </div>
                 <div className=" px-2 py-4 border-t-2 border-gray-300 dark:border-slate-800">
-                    <Link href={"/sign-in"} className=" inline-block w-full">
-                        <Button text="Sign In" rounded fullWidth icon={FiLogIn} iconPosition="end" />
-                    </Link>
-                    {/* <UserButton from="MAIN" /> */}
+                    {
+                        authUser ? (
+                            <UserButton from="MAIN" />
+                        ) : (
+                            <Link href={"/sign-in"} className=" inline-block w-full">
+                                <Button text="Sign In" rounded fullWidth icon={FiLogIn} iconPosition="end" />
+                            </Link>
+                        )
+                    }
                 </div>
             </div>
             <div onClick={() => setIsOpen(false)} className={`${isOpen ? ' visible scale-100' : ' invisible scale-0'} transition-all duration-500 md:hidden z-50 fixed top-4 right-4 w-10 aspect-square rounded-full shadow-lg text-2xl bg-white dark:bg-black/70 text-primary flex justify-center items-center hover:bg-primary hover:text-white active:scale-95 cursor-pointer`}>
