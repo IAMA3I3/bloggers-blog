@@ -1,8 +1,11 @@
 "use client"
 
+import { logoutAction } from "@/actions/auth";
 import { useStateContext } from "@/context/StateContext";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react"
+import toast from "react-hot-toast";
 import { FaAngleDown, FaUser } from "react-icons/fa6";
 
 type UserButtonProps = {
@@ -10,6 +13,7 @@ type UserButtonProps = {
 }
 
 export default function UserButton({ from }: UserButtonProps) {
+    const router = useRouter()
 
     const { setModalProps, setIsModalOpen } = useStateContext()
 
@@ -32,9 +36,11 @@ export default function UserButton({ from }: UserButtonProps) {
             text: "Proceed to logout",
             proceed: {
                 text: "Proceed",
-                onProceed: () => {
-                    console.log("Logged Out")
+                onProceed: async () => {
+                    await logoutAction()
                     setIsModalOpen(false)
+                    toast.success("Logged out")
+                    router.push("/sign-in")
                 }
             }
         })
