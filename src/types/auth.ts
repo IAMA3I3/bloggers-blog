@@ -1,3 +1,5 @@
+import { ObjectId } from "mongodb"
+
 export type UserRole = "admin" | "user"
 
 export type SignUpFormData = {
@@ -37,7 +39,7 @@ export type ChangePasswordFormData = {
 }
 
 export type User = {
-    _id: string
+    _id: ObjectId
     username: string
     email: string
     role: "admin" | "user"

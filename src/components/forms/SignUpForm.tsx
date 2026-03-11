@@ -7,6 +7,8 @@ import toast from "react-hot-toast"
 import { Input } from "../ui/Input"
 import { Button } from "../ui/Button"
 import Link from "next/link"
+import { signUpAction } from "@/actions/auth"
+import { useRouter } from "next/navigation"
 
 const initialData: SignUpFormData = {
     username: "",
@@ -16,6 +18,7 @@ const initialData: SignUpFormData = {
 }
 
 export default function SignUpForm() {
+    const router = useRouter()
     const [data, setData] = useState<SignUpFormData>(initialData)
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState<SignUpFormError>({})
@@ -37,13 +40,18 @@ export default function SignUpForm() {
             return
         }
 
-        await new Promise(res => setTimeout(res, 2000)) // simulate delay
-        console.log(data)
+        const result = await signUpAction(data)
+        if (!result.success) {
+            setError(result.errors)
+            setIsLoading(false)
+            return
+        }
 
         setData(initialData)
         setError({})
         setIsLoading(false)
         toast.success("Account created")
+        router.replace("/dashboard")
     }
 
     return (
