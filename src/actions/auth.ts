@@ -3,9 +3,12 @@
 import { getCollection } from "@/lib/db";
 import { createSession } from "@/lib/sessions";
 import { ActionResponse } from "@/types/action";
-import { SignUpFormData, User } from "@/types/auth";
+import { SignInFormData, SignUpFormData, User } from "@/types/auth";
+import { SignInFormError, validateSignIn } from "@/utils/validators/signInValidator";
 import { SignUpFormError, validateSignUp } from "@/utils/validators/signUpValidator";
 import bcrypt from "bcrypt"
+import { WithId } from "mongodb";
+import { cookies } from "next/headers";
 
 export async function signUpAction(data: SignUpFormData): ActionResponse<SignUpFormData, SignUpFormError> {
 
@@ -20,9 +23,6 @@ export async function signUpAction(data: SignUpFormData): ActionResponse<SignUpF
     }
 
     const { username, email, password } = data
-
-    await new Promise(resolve => setTimeout(resolve, 2000)) // delay 2s
-    console.log(data)
 
     // get or create the collection in db
     const userCollection = await getCollection<User>("users")
@@ -55,12 +55,76 @@ export async function signUpAction(data: SignUpFormData): ActionResponse<SignUpF
     // hash password
     const hashedPassword = await bcrypt.hash(password, 10)
 
+    const now = new Date()
+
     // insert into the db
-    const result = await userCollection.insertOne({username, email, password: hashedPassword, role: "user" } as User)
+    const result = await userCollection.insertOne({ username, email, password: hashedPassword, role: "user", createdAt: now, updatedAt: now } as User)
     console.log(result)
 
     // create a session
     await createSession(result.insertedId.toString(), email, username)
 
     return { success: true, errors: {}, data }
+}
+
+export async function signInAction(data: SignInFormData): ActionResponse<SignInFormData, SignInFormError> {
+
+    // validate data
+    const { isValid, errors } = validateSignIn(data)
+    if (!isValid) {
+        return {
+            success: false,
+            data,
+            errors
+        }
+    }
+
+    const { identifier, password } = data
+
+    // get the collection
+    const userCollection = await getCollection<User>("users")
+    if (!userCollection) {
+        return {
+            success: false,
+            data,
+            errors: { default: "Server error" }
+        }
+    }
+
+    // check if user exists
+    let existingUser: WithId<User> | null = null
+    if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier)) {
+        // identifier is email
+        existingUser = await userCollection.findOne({ email: identifier })
+    } else {
+        // identifier is username
+        existingUser = await userCollection.findOne({ username: identifier })
+    }
+    if (!existingUser) {
+        return {
+            success: false,
+            data,
+            errors: { default: "Invalid credential" }
+        }
+    }
+
+    // check password
+    const matchedPassword = await bcrypt.compare(password, existingUser.password)
+    if (!matchedPassword) {
+        return {
+            success: false,
+            data,
+            errors: { default: "Invalid credential" }
+        }
+    }
+
+    // create session
+    await createSession(existingUser._id.toString(), existingUser.email, existingUser.username)
+
+    return { success: true, errors: {}, data }
+}
+
+export async function logoutAction() {
+    const cookieStore = await cookies()
+    cookieStore.delete("session")
 }
