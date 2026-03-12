@@ -10,6 +10,8 @@ import bcrypt from "bcrypt"
 import { WithId } from "mongodb";
 import { cookies } from "next/headers";
 import crypto from "crypto"
+import { sendMail } from "@/lib/mail/sendMail";
+import { getVerifyEmailTemplate } from "@/lib/mail/templates/VerifyEmail";
 
 export async function signUpAction(data: SignUpFormData): ActionResponse<SignUpFormData, SignUpFormError> {
 
@@ -67,9 +69,12 @@ export async function signUpAction(data: SignUpFormData): ActionResponse<SignUpF
     const cookieStore = await cookies()
     cookieStore.set("verify-email", email, { maxAge: 600 })
 
-    // TODO: send link to user's email:
-    // `${process.env.NEXT_PUBLIC_SITE_URL}/verify-account?token=${verificationToken}`
-    
+    // send link to user's email:
+    const verificationUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/verify-account?token=${verificationToken}`
+    const { subject, html } = getVerifyEmailTemplate(username, verificationUrl)
+
+    await sendMail({ to: email, subject, html })
+
     // insert into the db
     const result = await userCollection.insertOne({ username, email, password: hashedPassword, role: "user", verified: false, verificationToken, verificationTokenExpires, createdAt: now, updatedAt: now } as User)
     console.log(result)
