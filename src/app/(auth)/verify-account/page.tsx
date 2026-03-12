@@ -1,5 +1,6 @@
+import ResendToken from "@/components/auth/ResendToken";
 import AuthFormContainer from "@/components/containers/AuthFormContainer";
-import VerifyAccountForm from "@/components/forms/VerifyAccountForm";
+// import VerifyAccountForm from "@/components/forms/VerifyAccountForm";
 import { siteUrl } from "@/utils/appStore";
 import { Metadata } from "next";
 
@@ -22,8 +23,9 @@ export const metadata: Metadata = {
 export default function ForgetPasswordPage() {
 
     return (
-        <AuthFormContainer header="Verify Account" subHeader="Enter the OTP that was sent to user@gmail.com">
-            <VerifyAccountForm />
+        <AuthFormContainer header="Verify Account" subHeader="Check your email for verification link">
+            <ResendToken type="verify-account" />
+            {/* <VerifyAccountForm /> */}
         </AuthFormContainer>
     )
 }

@@ -43,7 +43,12 @@ export type User = {
     username: string
     email: string
     role: "admin" | "user"
+    verified: boolean
     password: string
-    createdAt?: Date
+    verificationToken?: string,
+    verificationTokenExpires?: Date,
+    resetPasswordToken?: string,
+    resetPasswordTokenExpires?: Date,
+    createdAt: Date
     updatedAt?: Date
 }

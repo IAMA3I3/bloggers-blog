@@ -9,6 +9,7 @@ import { SignUpFormError, validateSignUp } from "@/utils/validators/signUpValida
 import bcrypt from "bcrypt"
 import { WithId } from "mongodb";
 import { cookies } from "next/headers";
+import crypto from "crypto"
 
 export async function signUpAction(data: SignUpFormData): ActionResponse<SignUpFormData, SignUpFormError> {
 
@@ -55,14 +56,26 @@ export async function signUpAction(data: SignUpFormData): ActionResponse<SignUpF
     // hash password
     const hashedPassword = await bcrypt.hash(password, 10)
 
+    // now
     const now = new Date()
 
+    // generate verification token (secure random hex token)
+    const verificationToken = crypto.randomBytes(32).toString("hex")
+    const verificationTokenExpires = new Date(now.getTime() + 10 * 60 * 1000) // 10 minutes
+
+    // create verify mail cookie
+    const cookieStore = await cookies()
+    cookieStore.set("verify-email", email, { maxAge: 600 })
+
+    // TODO: send link to user's email:
+    // `${process.env.NEXT_PUBLIC_SITE_URL}/verify-account?token=${verificationToken}`
+    
     // insert into the db
-    const result = await userCollection.insertOne({ username, email, password: hashedPassword, role: "user", createdAt: now, updatedAt: now } as User)
+    const result = await userCollection.insertOne({ username, email, password: hashedPassword, role: "user", verified: false, verificationToken, verificationTokenExpires, createdAt: now, updatedAt: now } as User)
     console.log(result)
 
-    // create a session
-    await createSession(result.insertedId.toString(), email, username)
+    // create a session only when no verification is needed
+    // await createSession(result.insertedId.toString(), email, username)
 
     return { success: true, errors: {}, data }
 }

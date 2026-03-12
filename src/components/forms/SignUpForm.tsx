@@ -51,7 +51,7 @@ export default function SignUpForm() {
         setError({})
         setIsLoading(false)
         toast.success("Account created")
-        router.replace("/dashboard")
+        router.replace("/verify-account")
     }
 
     return (
