@@ -4,18 +4,35 @@ import { useEffect, useState } from "react"
 import { Button } from "../ui/Button"
 import { FaArrowsRotate } from "react-icons/fa6";
 import toast from "react-hot-toast";
+import { resendVerificationLink } from "@/actions/auth";
 
 type ResendTokenProps = {
     type: "verify-account" | "reset-password"
+    email: string | null
 }
 
-const TIMER = 10
+const TIMER = 59
 
-export default function ResendToken({ type }: ResendTokenProps) {
+export default function ResendToken({ type, email }: ResendTokenProps) {
 
     const [countDown, setCountDown] = useState(TIMER)
+    const [error, setError] = useState("")
 
-    const onResend = () => {
+    const onResend = async () => {
+
+        if (type === "verify-account") {
+            if (!email) {
+                setError("Invalid user, please go to login")
+                return
+            }
+            const result = await resendVerificationLink(email)
+            if (!result.success) {
+                setError(result.error as string)
+                return
+            }
+        }
+
+        setError("")
 
         if (countDown <= 0) {
             setCountDown(TIMER)
@@ -34,7 +51,7 @@ export default function ResendToken({ type }: ResendTokenProps) {
     }, [countDown])
 
     return (
-        <div className=" flex justify-center">
+        <div className=" flex items-center flex-col text-center gap-4">
             <Button
                 text={countDown > 0 ? `Resend Link (${countDown})` : "Resend Link"}
                 isLoading={countDown > 0}
@@ -42,6 +59,7 @@ export default function ResendToken({ type }: ResendTokenProps) {
                 rounded
                 onClick={onResend}
             />
+            {error && <p className=" text-sm font-semibold text-red-400">{error}</p>}
         </div>
     )
 }

@@ -3,3 +3,8 @@ export type ActionResponse<D, E> = Promise<{
     errors: E
     data: D
 }>
+
+export type ActionResponseWithoutData = Promise<{
+    success: boolean
+    error?: string
+}>

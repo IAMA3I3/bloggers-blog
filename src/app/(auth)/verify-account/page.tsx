@@ -1,5 +1,6 @@
 import ResendToken from "@/components/auth/ResendToken";
 import AuthFormContainer from "@/components/containers/AuthFormContainer";
+import getVerificationMail from "@/lib/auth/getVerificationMail";
 // import VerifyAccountForm from "@/components/forms/VerifyAccountForm";
 import { siteUrl } from "@/utils/appStore";
 import { Metadata } from "next";
@@ -20,11 +21,22 @@ export const metadata: Metadata = {
     },
 }
 
-export default function ForgetPasswordPage() {
+type VerifyAccountPageProps = {
+    searchParams: Promise<{
+        token?: string
+    }>
+}
+
+export default async function VerifyAccountPage({ searchParams }: VerifyAccountPageProps) {
+
+    const token = await searchParams
+    const verifyEmail = await getVerificationMail()
+
+    console.log({ token })
 
     return (
         <AuthFormContainer header="Verify Account" subHeader="Check your email for verification link">
-            <ResendToken type="verify-account" />
+            <ResendToken type="verify-account" email={verifyEmail} />
             {/* <VerifyAccountForm /> */}
         </AuthFormContainer>
     )
