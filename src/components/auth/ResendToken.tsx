@@ -5,6 +5,7 @@ import { Button } from "../ui/Button"
 import { FaArrowsRotate } from "react-icons/fa6";
 import toast from "react-hot-toast";
 import { resendVerificationLink } from "@/actions/auth";
+import Link from "next/link";
 
 type ResendTokenProps = {
     type: "verify-account" | "reset-password"
@@ -59,7 +60,8 @@ export default function ResendToken({ type, email }: ResendTokenProps) {
                 rounded
                 onClick={onResend}
             />
-            {error && <p className=" text-sm font-semibold text-red-400">{error}</p>}
+            {error && <p className=" text-sm text-center font-semibold text-red-400">{error}</p>}
+            {error && <Link href={"/sign-in"} className=" text-center text-sm font-semibold text-primary hover:underline">Login</Link>}
         </div>
     )
 }
