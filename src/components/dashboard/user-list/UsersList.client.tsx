@@ -47,12 +47,16 @@ export default function UsersListClient({ users }: UsersListClientProps) {
             {
                 currentUsers.map(user => (
                     <ActionListItem
-                        key={user._id}
+                        key={user._id.toString()}
                         mutedText={user.role}
                         mainText={user.username}
                         contentText={user.email}
                         actionButton={{ action: "EDIT", href: `/dashboard/users/${user._id}` }}
-                        deleteAction={{ for: "USERS", id: user._id }}
+                        deleteAction={{ for: "USERS", id: user._id.toString() }}
+                        status={{
+                            variant: user.verified ? "success" : "secondary",
+                            text: user.verified ? "Verified" : "Not verified"
+                        }}
                     />
                 ))
             }
