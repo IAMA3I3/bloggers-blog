@@ -3,16 +3,18 @@
 import { getCollection } from "@/lib/db";
 import { createSession } from "@/lib/sessions";
 import { ActionResponse, ActionResponseWithoutData } from "@/types/action";
-import { SignInFormData, SignUpFormData, User } from "@/types/auth";
+import { EditProfileFormData, SignInFormData, SignUpFormData, User } from "@/types/auth";
 import { SignInFormError, validateSignIn } from "@/utils/validators/signInValidator";
 import { SignUpFormError, validateSignUp } from "@/utils/validators/signUpValidator";
 import bcrypt from "bcrypt"
-import { WithId } from "mongodb";
+import { ObjectId, WithId } from "mongodb";
 import { cookies } from "next/headers";
 import crypto from "crypto"
 import { sendMail } from "@/lib/mail/sendMail";
 import { getVerifyEmailTemplate } from "@/lib/mail/templates/VerifyEmail";
 import { redirect } from "next/navigation";
+import { EditProfileFormError, validateEditaProfile } from "@/utils/validators/editProfileValidator";
+import getAuthUser from "@/lib/auth/getAuthUser";
 
 export async function signUpAction(data: SignUpFormData): ActionResponse<SignUpFormData, SignUpFormError> {
 
@@ -236,4 +238,56 @@ export async function resendVerificationLink(email: string): ActionResponseWitho
     cookieStore.set("resend-cooldown", "1", { maxAge: 60, httpOnly: true })
 
     return { success: true }
+}
+
+
+// update profile
+export async function updateProfileAction(data: EditProfileFormData): ActionResponse<EditProfileFormData, EditProfileFormError> {
+    // check logged in user
+    const authUser = await getAuthUser()
+    if (!authUser) redirect("/sign-in")
+
+    // validate data
+    const { isValid, errors } = validateEditaProfile(data)
+    if (!isValid) {
+        return {
+            success: false,
+            data,
+            errors
+        }
+    }
+
+    const { username } = data
+
+    // get collection in db
+    const userCollection = await getCollection<User>("users")
+    if (!userCollection) {
+        return {
+            success: false,
+            data,
+            errors: { default: "Service temporarily unavailable" }
+        }
+    }
+
+    // check if username already exists
+    const existingUsername = await userCollection.findOne({ username, _id: { $ne: ObjectId.createFromHexString(authUser.userId) } })
+    if (existingUsername) {
+        return {
+            success: false,
+            data,
+            errors: { username: "Username alredy exists, try something else" }
+        }
+    }
+
+    // update profile
+    await userCollection.updateOne({ _id: ObjectId.createFromHexString(authUser.userId) }, {
+        $set: {
+            username,
+            updatedAt: new Date()
+        }
+    })
+
+    await createSession(authUser.userId, authUser.email!, username)
+
+    return { success: true, errors: {}, data }
 }

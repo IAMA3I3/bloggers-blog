@@ -7,6 +7,7 @@ import { EditProfileFormError, validateEditaProfile } from "@/utils/validators/e
 import { Button } from "../ui/Button"
 import toast from "react-hot-toast"
 import { useRouter } from "next/navigation"
+import { updateProfileAction } from "@/actions/auth"
 
 type EditProfileFormProps = {
     initialData: EditProfileFormData
@@ -32,8 +33,12 @@ export default function EditProfileForm({ initialData }: EditProfileFormProps) {
             return
         }
 
-        await new Promise(res => setTimeout(res, 2000))
-        console.log(data)
+        const result = await updateProfileAction(data)
+        if (!result.success) {
+            setError(result.errors)
+            setIsLoading(false)
+            return
+        }
 
         setError({})
         setIsLoading(false)
