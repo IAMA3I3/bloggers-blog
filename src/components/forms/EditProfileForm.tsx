@@ -6,12 +6,15 @@ import { FormEvent, useState } from "react"
 import { EditProfileFormError, validateEditaProfile } from "@/utils/validators/editProfileValidator"
 import { Button } from "../ui/Button"
 import toast from "react-hot-toast"
+import { useRouter } from "next/navigation"
 
 type EditProfileFormProps = {
     initialData: EditProfileFormData
 }
 
 export default function EditProfileForm({ initialData }: EditProfileFormProps) {
+
+    const router = useRouter()
 
     const [data, setData] = useState(initialData)
     const [isLoading, setIsLoading] = useState(false)
@@ -35,6 +38,7 @@ export default function EditProfileForm({ initialData }: EditProfileFormProps) {
         setError({})
         setIsLoading(false)
         toast.success("Profile updated")
+        router.replace("/dashboard/profile")
     }
 
     return (

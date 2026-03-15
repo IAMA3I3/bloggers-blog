@@ -6,8 +6,13 @@ import { CgClose } from "react-icons/cg"
 import { FiMenu } from "react-icons/fi"
 import NotificationButton from "../ui/NotificationButton"
 import SearchBar from "../ui/SearchBar"
+import { SessionPayload } from "@/lib/sessions"
 
-export default function Topbar() {
+type TopbarProp = {
+    authUser: SessionPayload
+}
+
+export default function Topbar({ authUser }: TopbarProp) {
 
     const { isSideBarOpened, toggleSideBar } = useStateContext()
 
@@ -28,7 +33,7 @@ export default function Topbar() {
                 <div className="flex items-center space-x-4">
                     <NotificationButton />
 
-                    <UserButton from="DASHBOARD" />
+                    <UserButton from="DASHBOARD" authUser={authUser} />
                 </div>
             </div>
         </header>

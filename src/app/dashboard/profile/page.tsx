@@ -1,9 +1,12 @@
 import { PageCard } from "@/components/containers/Cards";
 import { Button } from "@/components/ui/Button";
+import getAuthUser from "@/lib/auth/getAuthUser";
 import Link from "next/link";
 import { FaUser, FaEdit, FaLock } from "react-icons/fa";
 
-export default function ProfilePage() {
+export default async function ProfilePage() {
+
+    const authUser = await getAuthUser()
 
     return (
         <>
@@ -17,8 +20,8 @@ export default function ProfilePage() {
                     </div>
                 </div>
                 <div className=" text-center">
-                    <h3 className=" text-xl">User_Name</h3>
-                    <p>username@gmail.com</p>
+                    <h3 className=" text-xl">{authUser?.username}</h3>
+                    <p>{authUser?.email}</p>
                 </div>
                 <div className=" mt-8 flex flex-col sm:flex-row items-center sm:justify-center gap-4">
                     <Link href={"/dashboard/profile/edit"}>

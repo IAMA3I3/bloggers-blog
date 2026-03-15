@@ -3,6 +3,8 @@ import Topbar from "@/components/layout/Topbar";
 import Sidebar from "@/components/layout/Sidebar";
 import { Metadata } from "next";
 import { siteUrl } from "@/utils/appStore";
+import getAuthUser from "@/lib/auth/getAuthUser";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
     title: "Dashboard",
@@ -20,16 +22,20 @@ export const metadata: Metadata = {
     },
 }
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+
+    const authUser = await getAuthUser()
+
+    if (!authUser) redirect("/")
 
     return (
         <>
             <main className=" flex h-screen bg-gray-200 dark:bg-gray-600">
                 {/* sidebar */}
-                <Sidebar />
+                <Sidebar authUser={authUser} />
                 <div className="flex-1 flex flex-col overflow-hidden">
                     {/* topbar */}
-                    <Topbar />
+                    <Topbar authUser={authUser} />
                     <div id="dashboard-scroll-container" className="flex-1 overflow-y-auto p-6">
                         {children}
                     </div>

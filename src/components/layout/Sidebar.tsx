@@ -10,6 +10,7 @@ import { FaUser } from "react-icons/fa6";
 import { FaUsers, FaBlog, FaBell } from "react-icons/fa";
 import { Logo } from "../ui/Logo";
 import { useStateContext } from "@/context/StateContext";
+import { SessionPayload } from "@/lib/sessions";
 
 type NavLink = {
     title: string
@@ -25,7 +26,11 @@ const navLinks: NavLink[] = [
     { title: "Notifications", href: "/dashboard/notifications", icon: FaBell, access: ["admin", "user"] },
 ]
 
-export default function Sidebar() {
+type SidebarProps = {
+    authUser: SessionPayload
+}
+
+export default function Sidebar({ authUser }: SidebarProps) {
 
     const { isSideBarOpened, toggleSideBar, closeSideBar } = useStateContext()
     const pathname = usePathname()
@@ -81,8 +86,8 @@ export default function Sidebar() {
                             </div>
                             {isSideBarOpened && (
                                 <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-medium truncate">User Name</p>
-                                    <p className="text-xs text-gray-400 truncate">username@gmail.com</p>
+                                    <p className="text-sm font-medium truncate">{authUser.username}</p>
+                                    <p className="text-xs text-gray-400 truncate">{authUser.email}</p>
                                 </div>
                             )}
                         </div>

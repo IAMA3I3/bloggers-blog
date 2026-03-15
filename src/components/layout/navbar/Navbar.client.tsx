@@ -85,7 +85,7 @@ export default function NavbarClient({ authUser }: NavbarProps) {
                         <ThemeToggle />
                         {
                             authUser ? (
-                                <UserButton from="MAIN" />
+                                <UserButton from="MAIN" authUser={authUser} />
                             ) : (
                                 <Link href={"/sign-in"} className=" p-2 rounded-lg hover:bg-gray-300 dark:hover:bg-slate-800 transition-colors text-2xl hover:text-primary">
                                     <FiLogIn />
@@ -119,7 +119,7 @@ export default function NavbarClient({ authUser }: NavbarProps) {
                 <div className=" px-2 py-4 border-t-2 border-gray-300 dark:border-slate-800">
                     {
                         authUser ? (
-                            <UserButton from="MAIN" />
+                            <UserButton from="MAIN" authUser={authUser} />
                         ) : (
                             <Link href={"/sign-in"} className=" inline-block w-full">
                                 <Button text="Sign In" rounded fullWidth icon={FiLogIn} iconPosition="end" />

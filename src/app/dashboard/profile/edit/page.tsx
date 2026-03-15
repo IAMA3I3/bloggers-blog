@@ -1,12 +1,15 @@
 import { PageCard } from "@/components/containers/Cards";
 import EditProfileForm from "@/components/forms/EditProfileForm";
+import getAuthUser from "@/lib/auth/getAuthUser";
 import { EditProfileFormData } from "@/types/auth";
 import Link from "next/link";
 
-export default function EditProfilePage() {
+export default async function EditProfilePage() {
+
+    const authUser = await getAuthUser()
 
     const initialFormData: EditProfileFormData = {
-        username: "User_Name"
+        username: authUser?.username || ""
     }
 
     return (

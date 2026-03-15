@@ -2,6 +2,7 @@
 
 import { logoutAction } from "@/actions/auth";
 import { useStateContext } from "@/context/StateContext";
+import { SessionPayload } from "@/lib/sessions";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react"
@@ -10,9 +11,10 @@ import { FaAngleDown, FaUser } from "react-icons/fa6";
 
 type UserButtonProps = {
     from: "MAIN" | "DASHBOARD"
+    authUser: SessionPayload
 }
 
-export default function UserButton({ from }: UserButtonProps) {
+export default function UserButton({ from, authUser }: UserButtonProps) {
     const router = useRouter()
 
     const { setModalProps, setIsModalOpen } = useStateContext()
@@ -79,7 +81,7 @@ export default function UserButton({ from }: UserButtonProps) {
                 {
                     from === "MAIN" && (
                         <div className=" flex-1 overflow-hidden">
-                            <p className=" text-left md:hidden text-sm text-muted truncate">username@gmail.com</p>
+                            <p className=" text-left md:hidden text-sm text-muted truncate">{authUser.email}</p>
                         </div>
                     )
                 }
@@ -95,8 +97,8 @@ export default function UserButton({ from }: UserButtonProps) {
             `}
             >
                 <div className=" w-45">
-                    <p className=" text-sm font-semibold truncate">User Name</p>
-                    <p className=" text-sm truncate">username@gmail.com</p>
+                    <p className=" text-sm font-semibold truncate">{authUser.username}</p>
+                    <p className=" text-sm truncate">{authUser.email}</p>
                 </div>
                 <div className=" mt-2 space-y-2">
                     {

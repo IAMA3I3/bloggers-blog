@@ -24,7 +24,7 @@ export default function Hero() {
             </div>
 
             {/* ─── CONTENT ─── */}
-            <div className="relative z-10 container mx-auto px-6 py-24 lg:grid lg:grid-cols-2 lg:gap-16 lg:py-32">
+            <div className="relative z-10 container mx-auto px-6 py-24 lg:grid lg:grid-cols-2 lg:gap-16 md:py-32">
 
                 {/* LEFT */}
                 <div className="flex flex-col justify-center">
