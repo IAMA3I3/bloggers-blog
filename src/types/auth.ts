@@ -42,7 +42,7 @@ export type User = {
     _id: ObjectId
     username: string
     email: string
-    role: "admin" | "user"
+    role: UserRole
     verified: boolean
     password: string
     verificationToken?: string,

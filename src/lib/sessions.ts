@@ -2,6 +2,7 @@ import "server-only"
 
 import { jwtVerify, SignJWT, JWTPayload } from "jose"
 import { cookies } from "next/headers"
+import { UserRole } from "@/types/auth"
 
 const secretKey = process.env.SESSION_SECRET
 
@@ -15,6 +16,7 @@ export type SessionPayload = JWTPayload & {
     userId: string
     email?: string
     username?: string
+    role?: UserRole
 }
 
 export async function encrypt(
@@ -48,9 +50,9 @@ export async function decrypt(
     }
 }
 
-export async function createSession(userId: string, email: string, username: string) {
+export async function createSession(userId: string, email: string, username: string, role: UserRole) {
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-    const session = await encrypt({ userId, email, username })
+    const session = await encrypt({ userId, email, username, role })
     const cookieStore = await cookies()
 
     cookieStore.set('session', session, {

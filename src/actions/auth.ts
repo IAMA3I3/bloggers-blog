@@ -166,7 +166,7 @@ export async function signInAction(data: SignInFormData): ActionResponse<SignInF
     }
 
     // create session
-    await createSession(existingUser._id.toString(), existingUser.email, existingUser.username)
+    await createSession(existingUser._id.toString(), existingUser.email, existingUser.username, existingUser.role)
 
     return { success: true, errors: {}, data }
 }
@@ -288,7 +288,7 @@ export async function updateProfileAction(data: EditProfileFormData): ActionResp
         }
     })
 
-    await createSession(authUser.userId, authUser.email!, username)
+    await createSession(authUser.userId, authUser.email!, username, authUser.role!)
 
     return { success: true, errors: {}, data }
 }

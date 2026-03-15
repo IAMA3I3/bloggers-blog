@@ -29,7 +29,7 @@ export async function verifyAccount(token: string) {
     })
 
     // create session
-    await createSession(user._id.toString(), user.email, user.username)
+    await createSession(user._id.toString(), user.email, user.username, user.role)
 
     return true
 }
