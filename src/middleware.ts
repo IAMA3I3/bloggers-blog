@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import getAuthUser from "./lib/auth/getAuthUser"
 
 const protectedRoutes = ["/dashboard"]
-const publicRoutes = ["/sign-up", "/sign-in", "/forget-password", "/reset-password", "/verify-account"]
+const publicRoutes = ["/sign-up", "/sign-in", "/forget-password", "/reset-password"]
 
 export default async function middleware(req: NextRequest) {
 
