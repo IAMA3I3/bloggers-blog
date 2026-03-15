@@ -6,6 +6,8 @@ import { Input } from "../ui/Input";
 import { ChangeEvent, FormEvent, useState } from "react";
 import { ChangePasswordFormError, validateChangePassword } from "@/utils/validators/changePasswordValidator";
 import toast from "react-hot-toast";
+import { changePassword } from "@/actions/auth";
+import { useRouter } from "next/navigation";
 
 const initialData: ChangePasswordFormData = {
     currentPassword: "",
@@ -14,6 +16,8 @@ const initialData: ChangePasswordFormData = {
 }
 
 export default function ChangePasswordForm() {
+
+    const router = useRouter()
 
     const [data, setData] = useState(initialData)
     const [error, setError] = useState<ChangePasswordFormError>({})
@@ -36,13 +40,18 @@ export default function ChangePasswordForm() {
             return
         }
 
-        await new Promise(res => setTimeout(res, 2000))
-        console.log(data)
+        const result = await changePassword(data)
+        if (!result.success) {
+            setError(result.errors)
+            setIsLoading(false)
+            return
+        }
 
         setData(initialData)
         setError({})
         setIsLoading(false)
         toast.success("Password changed")
+        router.replace("/dashboard/profile")
     }
 
     return (

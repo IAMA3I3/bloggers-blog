@@ -3,7 +3,7 @@
 import { getCollection } from "@/lib/db";
 import { createSession } from "@/lib/sessions";
 import { ActionResponse, ActionResponseWithoutData } from "@/types/action";
-import { EditProfileFormData, SignInFormData, SignUpFormData, User } from "@/types/auth";
+import { ChangePasswordFormData, EditProfileFormData, SignInFormData, SignUpFormData, User } from "@/types/auth";
 import { SignInFormError, validateSignIn } from "@/utils/validators/signInValidator";
 import { SignUpFormError, validateSignUp } from "@/utils/validators/signUpValidator";
 import bcrypt from "bcrypt"
@@ -15,6 +15,7 @@ import { getVerifyEmailTemplate } from "@/lib/mail/templates/VerifyEmail";
 import { redirect } from "next/navigation";
 import { EditProfileFormError, validateEditaProfile } from "@/utils/validators/editProfileValidator";
 import getAuthUser from "@/lib/auth/getAuthUser";
+import { ChangePasswordFormError, validateChangePassword } from "@/utils/validators/changePasswordValidator";
 
 export async function signUpAction(data: SignUpFormData): ActionResponse<SignUpFormData, SignUpFormError> {
 
@@ -288,6 +289,79 @@ export async function updateProfileAction(data: EditProfileFormData): ActionResp
     })
 
     await createSession(authUser.userId, authUser.email!, username)
+
+    return { success: true, errors: {}, data }
+}
+
+
+// change password
+export async function changePassword(data: ChangePasswordFormData): ActionResponse<ChangePasswordFormData, ChangePasswordFormError> {
+    // check logged in user
+    const authUser = await getAuthUser()
+    if (!authUser) redirect("/sign-in")
+
+    // validate data
+    const { isValid, errors } = validateChangePassword(data)
+    if (!isValid) {
+        return {
+            success: false,
+            data,
+            errors
+        }
+    }
+
+    const { currentPassword, newPassword } = data
+
+    // get collection in db
+    const userCollection = await getCollection<User>("users")
+    if (!userCollection) {
+        return {
+            success: false,
+            data,
+            errors: { default: "Service temporarily unavailable" }
+        }
+    }
+
+    // fetch the user
+    const user = await userCollection.findOne({ _id: ObjectId.createFromHexString(authUser.userId) })
+    if (!user) {
+        return {
+            success: false,
+            data,
+            errors: { default: "Invalid user" }
+        }
+    }
+
+    // check password
+    const matchedPassword = await bcrypt.compare(currentPassword, user.password)
+    if (!matchedPassword) {
+        return {
+            success: false,
+            data,
+            errors: { currentPassword: "Incorrect password" }
+        }
+    }
+
+    // check if new password is same as current password
+    const samePassword = await bcrypt.compare(newPassword, user.password)
+    if (samePassword) {
+        return {
+            success: false,
+            data,
+            errors: { newPassword: "New password must be different from current password" }
+        }
+    }
+
+    // hash password
+    const hashedPassword = await bcrypt.hash(newPassword, 10)
+
+    // update password
+    await userCollection.updateOne({ _id: ObjectId.createFromHexString(authUser.userId) }, {
+        $set: {
+            password: hashedPassword,
+            updatedAt: new Date()
+        }
+    })
 
     return { success: true, errors: {}, data }
 }
