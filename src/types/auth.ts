@@ -52,3 +52,5 @@ export type User = {
     createdAt: Date
     updatedAt?: Date
 }
+
+export type SafeUser = Omit<User, "_id" | "password" | "verificationToken" | "verificationTokenExpires" | "resetPasswordToken" | "resetPasswordTokenExpires"> & { id: string }

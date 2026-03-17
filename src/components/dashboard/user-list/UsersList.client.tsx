@@ -2,12 +2,12 @@
 
 import Pagination from "@/components/ui/Pagination"
 import { ActionListItem } from "../../ui/ListItem"
-import { User } from "@/types/auth"
+import { SafeUser } from "@/types/auth"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect } from "react"
 
 type UsersListClientProps = {
-    users: User[]
+    users: SafeUser[]
 }
 
 const USERS_PER_PAGE = 10
@@ -47,12 +47,12 @@ export default function UsersListClient({ users }: UsersListClientProps) {
             {
                 currentUsers.map(user => (
                     <ActionListItem
-                        key={user._id.toString()}
+                        key={user.id}
                         mutedText={user.role}
                         mainText={user.username}
                         contentText={user.email}
-                        actionButton={{ action: "EDIT", href: `/dashboard/users/${user._id}` }}
-                        deleteAction={{ for: "USERS", id: user._id.toString() }}
+                        actionButton={{ action: "EDIT", href: `/dashboard/users/${user.id}` }}
+                        deleteAction={{ for: "USERS", id: user.id }}
                         status={{
                             variant: user.verified ? "success" : "secondary",
                             text: user.verified ? "Verified" : "Not verified"

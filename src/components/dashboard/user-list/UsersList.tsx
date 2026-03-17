@@ -1,11 +1,26 @@
-import { mockUsers } from "@/temp/usersData"
 import UsersListClient from "./UsersList.client"
+import { getCollection } from "@/lib/db"
+import { SafeUser, User } from "@/types/auth"
+import { WithId } from "mongodb"
+
+const serializeUsers = (users: WithId<User>[]): SafeUser[] => {
+    return users.map(({ _id, ...rest }) => ({
+        ...rest,
+        id: _id.toString()
+    }))
+}
 
 export default async function UsersList() {
 
-    await new Promise(res => setTimeout(res, 2000))
+    let users: SafeUser[] = []
 
-    const users = mockUsers
+    try {
+        const usersCollection = await getCollection<User>("users")
+        const rawUsers = await usersCollection.find().toArray()
+        users = serializeUsers(rawUsers)
+    } catch (err) {
+        throw new Error("Failed to load users")
+    }
 
     return <UsersListClient users={users} />
 }

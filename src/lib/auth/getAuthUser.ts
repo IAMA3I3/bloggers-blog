@@ -7,6 +7,11 @@ export default async function getAuthUser(): Promise<SessionPayload | null> {
 
     if (!session) return null
 
-    const user = await decrypt(session)
-    return user
+    try {
+        const user = await decrypt(session)
+        if (!user) return null
+        return user
+    } catch {
+        return null
+    }
 }
