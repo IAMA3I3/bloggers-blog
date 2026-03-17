@@ -16,7 +16,7 @@ export default async function UsersList() {
 
     try {
         const usersCollection = await getCollection<User>("users")
-        const rawUsers = await usersCollection.find().toArray()
+        const rawUsers = await usersCollection.find().sort({ createdAt: -1 }).toArray()
         users = serializeUsers(rawUsers)
     } catch (err) {
         throw new Error("Failed to load users")
