@@ -1,3 +1,4 @@
+import getAuthUser from "@/lib/auth/getAuthUser"
 import UsersListClient from "./UsersList.client"
 import { getCollection } from "@/lib/db"
 import { SafeUser, User } from "@/types/auth"
@@ -22,5 +23,7 @@ export default async function UsersList() {
         throw new Error("Failed to load users")
     }
 
-    return <UsersListClient users={users} />
+    const authUser = await getAuthUser()
+
+    return <UsersListClient users={users} authUser={authUser} />
 }

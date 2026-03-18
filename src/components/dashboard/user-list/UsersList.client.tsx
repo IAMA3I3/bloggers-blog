@@ -5,14 +5,17 @@ import { ActionListItem } from "../../ui/ListItem"
 import { SafeUser } from "@/types/auth"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect } from "react"
+import { formatPostDate } from "@/utils/formatPostDate"
+import { SessionPayload } from "@/lib/sessions"
 
 type UsersListClientProps = {
     users: SafeUser[]
+    authUser: SessionPayload | null
 }
 
 const USERS_PER_PAGE = 10
 
-export default function UsersListClient({ users }: UsersListClientProps) {
+export default function UsersListClient({ users, authUser }: UsersListClientProps) {
 
     const router = useRouter()
     const searchParams = useSearchParams()
@@ -45,20 +48,38 @@ export default function UsersListClient({ users }: UsersListClientProps) {
     return (
         <div className=" space-y-4">
             {
-                currentUsers.map(user => (
-                    <ActionListItem
-                        key={user.id}
-                        mutedText={user.role}
-                        mainText={user.username}
-                        contentText={user.email}
-                        actionButton={{ action: "EDIT", href: `/dashboard/users/${user.id}` }}
-                        deleteAction={{ for: "USERS", id: user.id }}
-                        status={{
-                            variant: user.verified ? "success" : "secondary",
-                            text: user.verified ? "Verified" : "Not verified"
-                        }}
-                    />
-                ))
+                currentUsers.map(user => {
+                    if (user.id === authUser?.userId) {
+                        return (
+                            <ActionListItem
+                                key={user.id}
+                                mutedText={`${user.role} - Joined ${formatPostDate(user.createdAt)}`}
+                                mainText={`${user.username} (Me)`}
+                                contentText={user.email}
+                                actionButton={{ action: "PROFILE", href: `/dashboard/profile` }}
+                                status={{
+                                    variant: user.verified ? "success" : "secondary",
+                                    text: user.verified ? "Verified" : "Not verified"
+                                }}
+                            />
+                        )
+                    } else {
+                        return (
+                            <ActionListItem
+                                key={user.id}
+                                mutedText={`${user.role} - Joined ${formatPostDate(user.createdAt)}`}
+                                mainText={user.username}
+                                contentText={user.email}
+                                actionButton={{ action: "EDIT", href: `/dashboard/users/${user.id}` }}
+                                deleteAction={{ for: "USERS", id: user.id }}
+                                status={{
+                                    variant: user.verified ? "success" : "secondary",
+                                    text: user.verified ? "Verified" : "Not verified"
+                                }}
+                            />
+                        )
+                    }
+                })
             }
             <Pagination totalPages={totalPages} currentPage={currentPage} setCurrentPage={setPage} />
         </div>

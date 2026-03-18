@@ -8,6 +8,7 @@ import { Button } from "./Button";
 import { useStateContext } from "@/context/StateContext";
 import { MdEditSquare } from "react-icons/md";
 import { GoDotFill } from "react-icons/go";
+import { FaUser } from "react-icons/fa";
 
 type LinkListItemProps = {
     href: string
@@ -41,7 +42,7 @@ type ActionListItemProps = {
     contentText?: string
     href?: string
     actionButton?: {
-        action: "EDIT"
+        action: "EDIT" | "PROFILE"
         href: string
     }
     deleteAction?: {
@@ -135,7 +136,8 @@ export const ActionListItem = ({ media, mutedText, mainText, contentText, href, 
                                         <Button
                                             icon={
                                                 actionButton.action === "EDIT" ?
-                                                    MdEditSquare : GoDotFill
+                                                    MdEditSquare : actionButton.action === "PROFILE" ?
+                                                        FaUser : GoDotFill
                                             }
                                             outlined
                                             size="small"
