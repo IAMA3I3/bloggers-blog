@@ -6,15 +6,17 @@ import { FaArrowsRotate } from "react-icons/fa6";
 import toast from "react-hot-toast";
 import { resendVerificationLink } from "@/actions/auth";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 type ResendTokenProps = {
     type: "verify-account" | "reset-password"
-    email: string | null
+    email?: string | null
 }
 
 const TIMER = 59
 
 export default function ResendToken({ type, email }: ResendTokenProps) {
+    const router = useRouter()
 
     const [countDown, setCountDown] = useState(TIMER)
     const [error, setError] = useState("")
@@ -31,6 +33,11 @@ export default function ResendToken({ type, email }: ResendTokenProps) {
                 setError(result.error as string)
                 return
             }
+            toast.success("Link sent")
+        }
+
+        if (type === "reset-password") {
+            router.replace("/forget-password")
         }
 
         setError("")
@@ -38,7 +45,6 @@ export default function ResendToken({ type, email }: ResendTokenProps) {
         if (countDown <= 0) {
             setCountDown(TIMER)
         }
-        toast.success("Link sent")
     }
 
     useEffect(() => {

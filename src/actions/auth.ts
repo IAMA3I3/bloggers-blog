@@ -3,7 +3,7 @@
 import { getCollection } from "@/lib/db";
 import { createSession } from "@/lib/sessions";
 import { ActionResponse, ActionResponseWithoutData } from "@/types/action";
-import { ChangePasswordFormData, EditProfileFormData, SignInFormData, SignUpFormData, User } from "@/types/auth";
+import { ChangePasswordFormData, EditProfileFormData, ForgetPasswordFormData, ResetPasswordFormData, SignInFormData, SignUpFormData, User } from "@/types/auth";
 import { SignInFormError, validateSignIn } from "@/utils/validators/signInValidator";
 import { SignUpFormError, validateSignUp } from "@/utils/validators/signUpValidator";
 import bcrypt from "bcrypt"
@@ -16,6 +16,9 @@ import { redirect } from "next/navigation";
 import { EditProfileFormError, validateEditaProfile } from "@/utils/validators/editProfileValidator";
 import getAuthUser from "@/lib/auth/getAuthUser";
 import { ChangePasswordFormError, validateChangePassword } from "@/utils/validators/changePasswordValidator";
+import { ForgetPasswordError, validateForgetPassword } from "@/utils/validators/forgetPasswordValidator";
+import { getResetPasswordEmailTemplate } from "@/lib/mail/templates/ResetPassword";
+import { ResetPasswordError, validateResetPassword } from "@/utils/validators/resetPasswordvalidator";
 
 export async function signUpAction(data: SignUpFormData): ActionResponse<SignUpFormData, SignUpFormError> {
 
@@ -73,7 +76,7 @@ export async function signUpAction(data: SignUpFormData): ActionResponse<SignUpF
     const cookieStore = await cookies()
     cookieStore.set("verify-email", email, { maxAge: 600 })
 
-    // send link to user's email:
+    // prepare link to user's email:
     const verificationUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/verify-account?token=${verificationToken}`
     const { subject, html } = getVerifyEmailTemplate(username, verificationUrl)
 
@@ -81,6 +84,7 @@ export async function signUpAction(data: SignUpFormData): ActionResponse<SignUpF
     const result = await userCollection.insertOne({ username, email, password: hashedPassword, role: "user", verified: false, verificationToken, verificationTokenExpires, createdAt: now, updatedAt: now } as User)
     console.log(result)
 
+    // send link to user's email:
     await sendMail({ to: email, subject, html })
 
     cookieStore.set("resend-cooldown", "1", { maxAge: 60, httpOnly: true })
@@ -364,4 +368,126 @@ export async function changePassword(data: ChangePasswordFormData): ActionRespon
     })
 
     return { success: true, errors: {}, data }
+}
+
+
+// forget password
+export async function forgetPasswordAction(data: ForgetPasswordFormData): ActionResponse<ForgetPasswordFormData, ForgetPasswordError> {
+
+    // validate data
+    const { isValid, errors } = validateForgetPassword(data)
+    if (!isValid) {
+        return { success: false, data, errors }
+    }
+
+    const { email } = data
+
+    // cookie cooldown check
+    const cookieStore = await cookies()
+    const lastSent = cookieStore.get("resend-cooldown")
+    if (lastSent) {
+        return {
+            success: false,
+            data,
+            errors: { default: "Please wait a minute before requesting another link." }
+        }
+    }
+
+    const userCollection = await getCollection<User>("users")
+    if (!userCollection) {
+        return { success: false, data, errors: { default: "Server error" } }
+    }
+
+    // generic message to avoid user enumeration
+    const existingUser = await userCollection.findOne({ email })
+    if (!existingUser) {
+        return {
+            success: false,
+            data,
+            errors: { email: "Not valid" }
+        }
+    }
+
+    const now = new Date()
+    const RESEND_COOLDOWN_MS = 60 * 1000
+
+    // db-level rate limit
+    if (existingUser.resetPasswordTokenExpires) {
+        const sentAt = new Date(existingUser.resetPasswordTokenExpires.getTime() - 10 * 60 * 1000)
+        const elapsed = now.getTime() - sentAt.getTime()
+
+        if (elapsed < RESEND_COOLDOWN_MS) {
+            const secondsLeft = Math.ceil((RESEND_COOLDOWN_MS - elapsed) / 1000)
+            return {
+                success: false,
+                data,
+                errors: { default: `Please wait ${secondsLeft} seconds before requesting another reset.` }
+            }
+        }
+    }
+
+    const resetPasswordToken = crypto.randomBytes(32).toString("hex")
+    const resetPasswordTokenExpires = new Date(now.getTime() + 10 * 60 * 1000)
+
+    const resetPasswordUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/reset-password?token=${resetPasswordToken}`
+    const { subject, html } = getResetPasswordEmailTemplate(existingUser.username, resetPasswordUrl)
+
+    // update db before sending mail
+    await userCollection.updateOne({ email }, {
+        $set: { resetPasswordToken, resetPasswordTokenExpires }
+    })
+
+    await sendMail({ to: email, subject, html })
+
+    cookieStore.set("resend-cooldown", "1", { maxAge: 60, httpOnly: true })
+
+    return { success: true, errors: {}, data }
+}
+
+
+// reset password
+export async function resetPasswordAction(token: string, data: ResetPasswordFormData): ActionResponse<ResetPasswordFormData, ResetPasswordError> {
+    if (!token) return { success: false, data, errors: { default: "Invalid token" } }
+
+    // validate data
+    const { isValid, errors } = validateResetPassword(data)
+    if (!isValid) {
+        return { success: false, data, errors }
+    }
+
+    const { password } = data
+
+    const userCollection = await getCollection<User>("users")
+    if (!userCollection) return { success: false, data, errors: { default: "Service temporarily down" } }
+
+    const user = await userCollection.findOne({
+        resetPasswordToken: token,
+        resetPasswordTokenExpires: { $gt: new Date() }
+    })
+    if (!user) return { success: false, data, errors: { default: "Invalid or expired token" } }
+
+    // check new password isn't the same as current
+    const samePassword = await bcrypt.compare(password, user.password)
+    if (samePassword) {
+        return {
+            success: false,
+            data,
+            errors: { password: "New password must be different from your old password" }
+        }
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10)
+
+    await userCollection.updateOne({ _id: user._id }, {
+        $set: {
+            password: hashedPassword,
+            updatedAt: new Date()
+        },
+        $unset: {
+            resetPasswordToken: "",
+            resetPasswordTokenExpires: ""
+        }
+    })
+
+    return { success: true, data, errors: {} }
 }

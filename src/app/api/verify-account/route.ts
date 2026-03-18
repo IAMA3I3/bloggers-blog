@@ -1,5 +1,3 @@
-"use server"
-
 import { verifyAccount } from "@/lib/auth/verifyAccount"
 import { redirect } from "next/navigation"
 import { NextRequest } from "next/server"

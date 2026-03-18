@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 export default function ForgetPasswordPage() {
 
     return (
-        <AuthFormContainer header="Forget Password" subHeader="Enter your registered email so we can send verification OTP to you">
+        <AuthFormContainer header="Forget Password" subHeader="Enter your registered email so we can send reset password link to you">
             <ForgetPasswordForm />
         </AuthFormContainer>
     )

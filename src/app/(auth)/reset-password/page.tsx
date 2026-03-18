@@ -1,3 +1,4 @@
+import ResendToken from "@/components/auth/ResendToken";
 import AuthFormContainer from "@/components/containers/AuthFormContainer";
 import ResetPasswordForm from "@/components/forms/ResetPasswordForm";
 import { siteUrl } from "@/utils/appStore";
@@ -19,11 +20,26 @@ export const metadata: Metadata = {
     },
 }
 
-export default function ForgetPasswordPage() {
+type ResetPasswordPageProps = {
+    searchParams: Promise<{
+        token?: string
+    }>
+}
+
+export default async function ResetPasswordPage({ searchParams }: ResetPasswordPageProps) {
+    const { token } = await searchParams
+
+    if (token) {
+        return (
+            <AuthFormContainer header="Reset Password" subHeader="Create a new password">
+                <ResetPasswordForm token={token} />
+            </AuthFormContainer>
+        )
+    }
 
     return (
-        <AuthFormContainer header="Reset Password" subHeader="Create a new password, enter the OTP sent to use***@gmail.com">
-            <ResetPasswordForm />
+        <AuthFormContainer header="Reset Password" subHeader="Check your email for password reset link">
+            <ResendToken type="reset-password" />
         </AuthFormContainer>
     )
 }

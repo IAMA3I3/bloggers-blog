@@ -14,7 +14,6 @@ export type ForgetPasswordFormData = {
 }
 
 export type ResetPasswordFormData = {
-    otp: string
     password: string
     confirmPassword: string
 }

@@ -6,12 +6,15 @@ import { ChangeEvent, FormEvent, useState } from "react"
 import toast from "react-hot-toast"
 import { Input } from "../ui/Input"
 import { Button } from "../ui/Button"
+import { forgetPasswordAction } from "@/actions/auth"
+import { useRouter } from "next/navigation"
 
 const initialData: ForgetPasswordFormData = {
     email: ""
 }
 
 export default function ForgetPasswordForm() {
+    const router = useRouter()
     const [data, setData] = useState<ForgetPasswordFormData>(initialData)
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState<ForgetPasswordError>({})
@@ -33,13 +36,18 @@ export default function ForgetPasswordForm() {
             return
         }
 
-        await new Promise(res => setTimeout(res, 2000)) // simulate delay
-        console.log(data)
+        const result = await forgetPasswordAction(data)
+        if (!result.success) {
+            setError(result.errors)
+            setIsLoading(false)
+            return
+        }
 
         setData(initialData)
         setError({})
         setIsLoading(false)
-        toast.success("Verification mail sent")
+        toast.success("Password reset link sent")
+        router.replace("/reset-password")
     }
 
     return (

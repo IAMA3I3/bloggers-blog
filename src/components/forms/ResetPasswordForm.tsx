@@ -6,14 +6,20 @@ import { ChangeEvent, FormEvent, useState } from "react"
 import toast from "react-hot-toast"
 import { Input } from "../ui/Input"
 import { Button } from "../ui/Button"
+import { resetPasswordAction } from "@/actions/auth"
+import { useRouter } from "next/navigation"
+
+type ResetPasswordFormProps = {
+    token: string
+}
 
 const initialData: ResetPasswordFormData = {
-    otp: "",
     password: "",
     confirmPassword: ""
 }
 
-export default function ResetPasswordForm() {
+export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
+    const router = useRouter()
     const [data, setData] = useState<ResetPasswordFormData>(initialData)
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState<ResetPasswordError>({})
@@ -35,30 +41,24 @@ export default function ResetPasswordForm() {
             return
         }
 
-        await new Promise(res => setTimeout(res, 2000)) // simulate delay
-        console.log(data)
+        const result = await resetPasswordAction(token, data)
+        if (!result.success) {
+            setError(result.errors)
+            setIsLoading(false)
+            return
+        }
 
         setData(initialData)
         setError({})
         setIsLoading(false)
         toast.success("Password changed")
+        router.replace("/sign-in")
     }
 
     return (
         <div className=" w-full">
             <form onSubmit={onFormSubmit} className=" w-full space-y-4">
                 {error.default && <p className=" text-sm font-semibold text-red-400 text-center">{error.default}</p>}
-                <Input
-                    variant="secondary"
-                    value={data.otp}
-                    onChange={onInputChange}
-                    type="text"
-                    name="otp"
-                    label="OTP"
-                    id="otp"
-                    backgroundColor=" bg-white dark:bg-slate-900"
-                    error={error.otp || undefined}
-                />
                 <Input
                     variant="secondary"
                     value={data.password}

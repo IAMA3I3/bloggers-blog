@@ -2,17 +2,12 @@ import { ResetPasswordFormData } from "@/types/auth"
 
 export type ResetPasswordError = {
     default?: string
-    otp?: string
     password?: string
     confirmPassword?: string
 }
 
 export function validateResetPassword(data: ResetPasswordFormData) {
     let errors: ResetPasswordError = {}
-
-    if (data.otp.trim() === "") {
-        errors.otp = "OTP is required"
-    }
 
     if (data.password.length < 8) {
         errors.password = "Password must be at least 8 characters"
