@@ -56,6 +56,7 @@ export default function ChangePasswordForm() {
 
     return (
         <form onSubmit={onFormSubmit} className=" w-full space-y-4">
+            {error.default && <p className=" text-sm font-semibold text-red-400 text-center">{error.default}</p>}
             <Input
                 variant="secondary"
                 label="Current Password"

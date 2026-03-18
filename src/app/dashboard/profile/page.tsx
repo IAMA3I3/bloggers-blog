@@ -38,6 +38,9 @@ export default async function ProfilePage() {
                         />
                     </Link>
                 </div>
+                <div className=" mt-8 flex justify-center">
+                    <Link href={"/dashboard/profile/delete-account"} className=" text-sm font-semibold text-red-400 hover:underline text-center">Delete Account</Link>
+                </div>
             </PageCard>
         </>
     )

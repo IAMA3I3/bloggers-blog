@@ -37,6 +37,10 @@ export type ChangePasswordFormData = {
     confirmPassword: string
 }
 
+export type DeleteAccountFormData = {
+    password: string
+}
+
 export type User = {
     _id: ObjectId
     username: string
