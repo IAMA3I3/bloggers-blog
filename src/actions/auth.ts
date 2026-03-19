@@ -514,6 +514,11 @@ export async function deleteAccountAction(data: DeleteAccountFormData): ActionRe
     const user = await userCollection.findOne({ _id: ObjectId.createFromHexString(authUser.userId) })
     if (!user) return { success: false, data, errors: { default: "Invalid user" } }
 
+    // prevent delete for super admin
+    if (user.email === process.env.SUPER_ADMIN_EMAIL) {
+        return { success: false, data, errors: { default: "This user cannot be deleted" } }
+    }
+
     // compare password
     const matchedPassword = await bcrypt.compare(password, user.password)
     if (!matchedPassword) return { success: false, data, errors: { password: "Incorrect password" } }
@@ -549,6 +554,11 @@ export async function updateRoleAction(userId: string, role: UserRole): ActionRe
     // check user exist
     const existingUser = await userCollection.findOne({ _id: ObjectId.createFromHexString(userId) })
     if (!existingUser) return { success: false, data: role, errors: "Invalid user" }
+
+    // prevent demoting the protected super admin
+    if (existingUser.email === process.env.SUPER_ADMIN_EMAIL) {
+        return { success: false, data: role, errors: "This user cannot be demoted" }
+    }
 
     // update user role
     await userCollection.updateOne({ _id: existingUser._id }, {
