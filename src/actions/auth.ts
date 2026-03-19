@@ -3,7 +3,7 @@
 import { getCollection } from "@/lib/db";
 import { createSession } from "@/lib/sessions";
 import { ActionResponse, ActionResponseWithoutData } from "@/types/action";
-import { ChangePasswordFormData, DeleteAccountFormData, EditProfileFormData, ForgetPasswordFormData, ResetPasswordFormData, SignInFormData, SignUpFormData, User } from "@/types/auth";
+import { ChangePasswordFormData, DeleteAccountFormData, EditProfileFormData, ForgetPasswordFormData, ResetPasswordFormData, SignInFormData, SignUpFormData, User, UserRole } from "@/types/auth";
 import { SignInFormError, validateSignIn } from "@/utils/validators/signInValidator";
 import { SignUpFormError, validateSignUp } from "@/utils/validators/signUpValidator";
 import bcrypt from "bcrypt"
@@ -526,4 +526,37 @@ export async function deleteAccountAction(data: DeleteAccountFormData): ActionRe
     cookieStore.delete("session")
 
     return { success: true, data, errors: {} }
+}
+
+// update role
+export async function updateRoleAction(userId: string, role: UserRole): ActionResponse<UserRole, string> {
+    // validate role
+    const validRoles: UserRole[] = ["admin", "user"]
+    if (!validRoles.includes(role)) return { success: false, data: role, errors: "Invalid role" }
+
+    // check auth user
+    const authUser = await getAuthUser()
+    if (!authUser) redirect("/sign-in")
+    if (authUser.role !== "admin") return { success: false, data: role, errors: "Unathorized user" }
+    if (authUser.userId === userId) {
+        return { success: false, data: role, errors: "You cannot change your own role" }
+    }
+
+    // get collection
+    const userCollection = await getCollection<User>("users")
+    if (!userCollection) return { success: false, data: role, errors: "Service temporarily down" }
+
+    // check user exist
+    const existingUser = await userCollection.findOne({ _id: ObjectId.createFromHexString(userId) })
+    if (!existingUser) return { success: false, data: role, errors: "Invalid user" }
+
+    // update user role
+    await userCollection.updateOne({ _id: existingUser._id }, {
+        $set: {
+            role,
+            updatedAt: new Date()
+        }
+    })
+
+    return { success: true, data: role, errors: "" }
 }

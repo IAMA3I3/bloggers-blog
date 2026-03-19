@@ -1,5 +1,8 @@
 import { PageCard } from "@/components/containers/Cards"
 import UserRoleForm from "@/components/forms/UserRoleForm"
+import { getCollection } from "@/lib/db"
+import { SafeUser, User } from "@/types/auth"
+import { ObjectId, WithId } from "mongodb"
 import Link from "next/link"
 import { Suspense } from "react"
 
@@ -7,6 +10,10 @@ type UserEditPageProps = {
     params: Promise<{
         userId: string
     }>
+}
+
+const serializeUser = (user: WithId<User>): SafeUser => {
+    return { ...user, id: user._id.toString() }
 }
 
 export default async function UserEditPage({ params }: UserEditPageProps) {
@@ -22,18 +29,27 @@ export default async function UserEditPage({ params }: UserEditPageProps) {
 
 async function RenderUsersEditPage({ id }: { id: string }) {
 
-    await new Promise(res => setTimeout(res, 2000))
+    let user: SafeUser
+
+    try {
+        const usersCollection = await getCollection<User>("users")
+        const rawUser = await usersCollection.findOne({ _id: ObjectId.createFromHexString(id) })
+        if (!rawUser) throw new Error("Failed to load user")
+        user = serializeUser(rawUser)
+    } catch (err) {
+        throw new Error("Failed to load user")
+    }
 
     return (
         <>
             <h2 className="text-2xl font-semibold mb-6">
-                <Link href={"/dashboard/users"} className=" text-muted hover:text-primary">Users</Link> {"/"} {id}
+                <Link href={"/dashboard/users"} className=" text-muted hover:text-primary">Users</Link> {"/"} {user.username}
             </h2>
             <PageCard centerAlign>
-                <h4 className=" text-center text-xl font-semibold">User_name</h4>
-                <p className=" text-center font-semibold">username@gmail.com</p>
+                <h4 className=" text-center text-xl font-semibold">{user.username}</h4>
+                <p className=" text-center font-semibold">{user.email}</p>
                 {/* form */}
-                <UserRoleForm initialRole={"user"} />
+                <UserRoleForm userId={user.id} initialRole={user.role} />
             </PageCard>
         </>
     )

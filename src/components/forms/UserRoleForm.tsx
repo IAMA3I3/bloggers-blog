@@ -5,10 +5,16 @@ import { DropSelectMenu } from "../ui/DropMenu"
 import { Dispatch, FormEvent, SetStateAction, useState } from "react"
 import { Button } from "../ui/Button"
 import toast from "react-hot-toast"
+import { updateRoleAction } from "@/actions/auth"
+
+type UserRoleFormProps = {
+    userId: string
+    initialRole: UserRole
+}
 
 const userRoles: UserRole[] = ["user", "admin"]
 
-export default function UserRoleForm({ initialRole }: { initialRole: UserRole }) {
+export default function UserRoleForm({ userId, initialRole }: UserRoleFormProps) {
 
     const [role, setRole] = useState<UserRole>(initialRole)
     const [isLoading, setIsLoading] = useState(false)
@@ -17,8 +23,12 @@ export default function UserRoleForm({ initialRole }: { initialRole: UserRole })
         e.preventDefault()
         setIsLoading(true)
 
-        await new Promise(res => setTimeout(res, 3000)) // simulate delay
-        console.log({ role })
+        const result = await updateRoleAction(userId, role)
+        if (!result.success) {
+            setIsLoading(false)
+            toast.error(result.errors)
+            return
+        }
 
         setIsLoading(false)
         toast.success("Role updated")
