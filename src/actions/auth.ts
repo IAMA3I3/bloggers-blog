@@ -3,7 +3,7 @@
 import { getCollection } from "@/lib/db";
 import { createSession } from "@/lib/sessions";
 import { ActionResponse, ActionResponseWithoutData } from "@/types/action";
-import { ChangePasswordFormData, EditProfileFormData, ForgetPasswordFormData, ResetPasswordFormData, SignInFormData, SignUpFormData, User } from "@/types/auth";
+import { ChangePasswordFormData, DeleteAccountFormData, EditProfileFormData, ForgetPasswordFormData, ResetPasswordFormData, SignInFormData, SignUpFormData, User } from "@/types/auth";
 import { SignInFormError, validateSignIn } from "@/utils/validators/signInValidator";
 import { SignUpFormError, validateSignUp } from "@/utils/validators/signUpValidator";
 import bcrypt from "bcrypt"
@@ -19,6 +19,7 @@ import { ChangePasswordFormError, validateChangePassword } from "@/utils/validat
 import { ForgetPasswordError, validateForgetPassword } from "@/utils/validators/forgetPasswordValidator";
 import { getResetPasswordEmailTemplate } from "@/lib/mail/templates/ResetPassword";
 import { ResetPasswordError, validateResetPassword } from "@/utils/validators/resetPasswordvalidator";
+import { DeleteAccountFormError, validateDeleteAccount } from "@/utils/validators/deleteAccountValidator";
 
 export async function signUpAction(data: SignUpFormData): ActionResponse<SignUpFormData, SignUpFormError> {
 
@@ -488,6 +489,41 @@ export async function resetPasswordAction(token: string, data: ResetPasswordForm
             resetPasswordTokenExpires: ""
         }
     })
+
+    return { success: true, data, errors: {} }
+}
+
+// delete account
+export async function deleteAccountAction(data: DeleteAccountFormData): ActionResponse<DeleteAccountFormData, DeleteAccountFormError> {
+
+    // validate input
+    const { isValid, errors } = validateDeleteAccount(data)
+    if (!isValid) return { success: false, data, errors }
+
+    // check auth user
+    const authUser = await getAuthUser()
+    if (!authUser) return { success: false, data, errors: { default: "Invalid user" } }
+
+    // get users collection
+    const userCollection = await getCollection<User>("users")
+    if (!userCollection) return { success: false, data, errors: { default: "Service temporarily down" } }
+
+    const { password } = data
+
+    // fetch user
+    const user = await userCollection.findOne({ _id: ObjectId.createFromHexString(authUser.userId) })
+    if (!user) return { success: false, data, errors: { default: "Invalid user" } }
+
+    // compare password
+    const matchedPassword = await bcrypt.compare(password, user.password)
+    if (!matchedPassword) return { success: false, data, errors: { password: "Incorrect password" } }
+
+    // delete account
+    await userCollection.deleteOne({ _id: user._id })
+
+    // unset session
+    const cookieStore = await cookies()
+    cookieStore.delete("session")
 
     return { success: true, data, errors: {} }
 }

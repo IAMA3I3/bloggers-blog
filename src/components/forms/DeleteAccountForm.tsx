@@ -7,6 +7,7 @@ import { ChangeEvent, FormEvent, useState } from "react"
 import toast from "react-hot-toast"
 import { Input } from "../ui/Input"
 import { Button } from "../ui/Button"
+import { deleteAccountAction } from "@/actions/auth"
 
 const initialData: DeleteAccountFormData = {
     password: ""
@@ -37,8 +38,12 @@ export default function DeleteAccountForm() {
             return
         }
 
-        await new Promise(res => setTimeout(res, 2000))
-        console.log(data)
+        const result = await deleteAccountAction(data)
+        if (!result.success) {
+            setError(result.errors)
+            setIsLoading(false)
+            return
+        }
 
         setData(initialData)
         setError({})
