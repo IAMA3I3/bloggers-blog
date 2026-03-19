@@ -3,7 +3,7 @@
 import { getCollection } from "@/lib/db";
 import { createSession } from "@/lib/sessions";
 import { ActionResponse, ActionResponseWithoutData } from "@/types/action";
-import { ChangePasswordFormData, DeleteAccountFormData, EditProfileFormData, ForgetPasswordFormData, ResetPasswordFormData, SignInFormData, SignUpFormData, User, UserRole } from "@/types/auth";
+import { ChangePasswordFormData, DeleteAccountFormData, EditProfileFormData, ForgetPasswordFormData, ResetPasswordFormData, SignInFormData, SignUpFormData, User, UserRole, UserStatus } from "@/types/auth";
 import { SignInFormError, validateSignIn } from "@/utils/validators/signInValidator";
 import { SignUpFormError, validateSignUp } from "@/utils/validators/signUpValidator";
 import bcrypt from "bcrypt"
@@ -82,7 +82,7 @@ export async function signUpAction(data: SignUpFormData): ActionResponse<SignUpF
     const { subject, html } = getVerifyEmailTemplate(username, verificationUrl)
 
     // insert into the db
-    const result = await userCollection.insertOne({ username, email, password: hashedPassword, role: "user", verified: false, verificationToken, verificationTokenExpires, createdAt: now, updatedAt: now } as User)
+    const result = await userCollection.insertOne({ username, email, password: hashedPassword, role: "user", status: "active", verified: false, verificationToken, verificationTokenExpires, createdAt: now, updatedAt: now } as User)
     console.log(result)
 
     // send link to user's email:
@@ -147,6 +147,15 @@ export async function signInAction(data: SignInFormData): ActionResponse<SignInF
         }
     }
 
+    // check if user is active
+    if (existingUser.status === "inactive") {
+        return {
+            success: false,
+            data,
+            errors: { default: "This account is inactive, pls contact us for more information." }
+        }
+    }
+
     // check if account is verified
     if (!existingUser.verified) {
         const now = new Date()
@@ -208,6 +217,10 @@ export async function resendVerificationLink(email: string): ActionResponseWitho
 
     if (existingUser.verified) {
         return { success: false, error: "Account is already verified" }
+    }
+
+    if (existingUser.status === "inactive") {
+        return { success: false, error: "This account is inactive, please contact us for more information." }
     }
 
     const now = new Date()
@@ -281,7 +294,7 @@ export async function updateProfileAction(data: EditProfileFormData): ActionResp
         return {
             success: false,
             data,
-            errors: { username: "Username alredy exists, try something else" }
+            errors: { username: "Username already exists, try something else" }
         }
     }
 
@@ -569,4 +582,32 @@ export async function updateRoleAction(userId: string, role: UserRole): ActionRe
     })
 
     return { success: true, data: role, errors: "" }
+}
+
+export async function updateStatusAction(userId: string, status: UserStatus): ActionResponse<UserStatus, string> {
+    // validate role
+    const validStatus: UserStatus[] = ["active", "inactive"]
+    if (!validStatus.includes(status)) return { success: false, data: status, errors: "Invalid role" }
+
+    const authUser = await getAuthUser()
+    if (!authUser) redirect("/sign-in")
+    if (authUser.role !== "admin") return { success: false, data: status, errors: "Unauthorized user" }
+    if (authUser.userId === userId) return { success: false, data: status, errors: "You cannot change your own status" }
+
+    const userCollection = await getCollection<User>("users")
+    if (!userCollection) return { success: false, data: status, errors: "Service temporarily down" }
+
+    const existingUser = await userCollection.findOne({ _id: ObjectId.createFromHexString(userId) })
+    if (!existingUser) return { success: false, data: status, errors: "Invalid user" }
+
+    // protect super admin from being deactivated
+    if (existingUser.email === process.env.SUPER_ADMIN_EMAIL) {
+        return { success: false, data: status, errors: "This user cannot be deactivated" }
+    }
+
+    await userCollection.updateOne({ _id: existingUser._id }, {
+        $set: { status, updatedAt: new Date() }
+    })
+
+    return { success: true, data: status, errors: "" }
 }

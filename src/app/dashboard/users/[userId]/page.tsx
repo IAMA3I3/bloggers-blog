@@ -1,5 +1,6 @@
 import { PageCard } from "@/components/containers/Cards"
 import UserRoleForm from "@/components/forms/UserRoleForm"
+import UserStatusForm from "@/components/forms/UserStatusForm"
 import { getCollection } from "@/lib/db"
 import { SafeUser, User } from "@/types/auth"
 import { ObjectId, WithId } from "mongodb"
@@ -48,8 +49,10 @@ async function RenderUsersEditPage({ id }: { id: string }) {
             <PageCard centerAlign>
                 <h4 className=" text-center text-xl font-semibold">{user.username}</h4>
                 <p className=" text-center font-semibold">{user.email}</p>
-                {/* form */}
+                <h6 className=" text-lg text-center mt-8">Role</h6>
                 <UserRoleForm userId={user.id} initialRole={user.role} />
+                <h6 className=" text-lg text-center mt-8">Status</h6>
+                <UserStatusForm userId={user.id} initialStatus={user.status} />
             </PageCard>
         </>
     )

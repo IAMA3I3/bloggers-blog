@@ -1,6 +1,7 @@
 import { ObjectId } from "mongodb"
 
 export type UserRole = "admin" | "user"
+export type UserStatus = "active" | "inactive"
 
 export type SignUpFormData = {
     username: string
@@ -46,6 +47,7 @@ export type User = {
     username: string
     email: string
     role: UserRole
+    status: UserStatus
     verified: boolean
     password: string
     verificationToken?: string,

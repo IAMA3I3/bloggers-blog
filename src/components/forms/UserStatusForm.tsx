@@ -1,29 +1,29 @@
 "use client"
 
-import { UserRole } from "@/types/auth"
-import { DropSelectMenu } from "../ui/DropMenu"
+import { updateStatusAction } from "@/actions/auth"
+import { UserStatus } from "@/types/auth"
 import { Dispatch, FormEvent, SetStateAction, useState } from "react"
-import { Button } from "../ui/Button"
 import toast from "react-hot-toast"
-import { updateRoleAction } from "@/actions/auth"
+import { DropSelectMenu } from "../ui/DropMenu"
+import { Button } from "../ui/Button"
 
-type UserRoleFormProps = {
+type UserStatusFormProps = {
     userId: string
-    initialRole: UserRole
+    initialStatus: UserStatus
 }
 
-const userRoles: UserRole[] = ["user", "admin"]
+const userStatus: UserStatus[] = ["active", "inactive"]
 
-export default function UserRoleForm({ userId, initialRole }: UserRoleFormProps) {
+export default function UserStatusForm({ userId, initialStatus }: UserStatusFormProps) {
 
-    const [role, setRole] = useState<UserRole>(initialRole)
+    const [status, setStatus] = useState<UserStatus>(initialStatus)
     const [isLoading, setIsLoading] = useState(false)
 
     const onFormSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         setIsLoading(true)
 
-        const result = await updateRoleAction(userId, role)
+        const result = await updateStatusAction(userId, status)
         if (!result.success) {
             setIsLoading(false)
             toast.error(result.errors)
@@ -31,21 +31,21 @@ export default function UserRoleForm({ userId, initialRole }: UserRoleFormProps)
         }
 
         setIsLoading(false)
-        toast.success("Role updated")
+        toast.success("Status updated")
     }
 
     return (
         <form onSubmit={onFormSubmit}>
             <DropSelectMenu
-                value={role}
-                setValue={setRole as Dispatch<SetStateAction<string>>}
-                menuItems={userRoles}
+                value={status}
+                setValue={setStatus as Dispatch<SetStateAction<string>>}
+                menuItems={userStatus}
                 fullWidth
                 className=" w-full bg-transparent py-2 px-4 rounded-full border-2 border-border focus:border-primary outline-none"
             />
             <div className=" mt-4 flex justify-center">
                 <Button
-                    text="Update Role"
+                    text="Update Status"
                     rounded
                     type="submit"
                     isLoading={isLoading}

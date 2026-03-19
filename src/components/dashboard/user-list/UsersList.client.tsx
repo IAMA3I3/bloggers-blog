@@ -68,7 +68,7 @@ export default function UsersListClient({ users, authUser }: UsersListClientProp
                             <ActionListItem
                                 key={user.id}
                                 mutedText={`${user.role} - Joined ${formatPostDate(user.createdAt)}`}
-                                mainText={user.username}
+                                mainText={`${user.username} ${user.status === "inactive" ? "(Deactivated)" : ""}`}
                                 contentText={user.email}
                                 actionButton={{ action: "EDIT", href: `/dashboard/users/${user.id}` }}
                                 deleteAction={{ for: "USERS", id: user.id }}
