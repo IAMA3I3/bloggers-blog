@@ -611,3 +611,28 @@ export async function updateStatusAction(userId: string, status: UserStatus): Ac
 
     return { success: true, data: status, errors: "" }
 }
+
+// delete user action
+export async function deleteUserAction(userId: string): ActionResponse<string, string> {
+    // check auth user
+    const authUser = await getAuthUser()
+    if (!authUser) redirect("/sign-in")
+    if (authUser.role !== "admin") return { success: false, data: userId, errors: "Unauthorized user" }
+    if (authUser.userId === userId) return { success: false, data: userId, errors: "You cannot delete your account from here. go to profile." }
+
+    const userCollection = await getCollection<User>("users")
+    if (!userCollection) return { success: false, data: userId, errors: "Service temporarily down" }
+
+    const existingUser = await userCollection.findOne({ _id: ObjectId.createFromHexString(userId) })
+    if (!existingUser) return { success: false, data: userId, errors: "Invalid user" }
+
+    // protect super admin from being deactivated
+    if (existingUser.email === process.env.SUPER_ADMIN_EMAIL) {
+        return { success: false, data: userId, errors: "This user cannot be deleted" }
+    }
+
+    // delete user
+    await userCollection.deleteOne({ _id: existingUser._id })
+
+    return { success: true, data: userId, errors: "" }
+}

@@ -9,6 +9,9 @@ import { useStateContext } from "@/context/StateContext";
 import { MdEditSquare } from "react-icons/md";
 import { GoDotFill } from "react-icons/go";
 import { FaUser } from "react-icons/fa";
+import { deleteUserAction } from "@/actions/auth";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 type LinkListItemProps = {
     href: string
@@ -57,6 +60,8 @@ type ActionListItemProps = {
 
 export const ActionListItem = ({ media, mutedText, mainText, contentText, href, actionButton, deleteAction, status }: ActionListItemProps) => {
 
+    const router = useRouter()
+
     const { setIsModalOpen, setModalProps } = useStateContext()
 
     const onDelete = () => {
@@ -65,8 +70,17 @@ export const ActionListItem = ({ media, mutedText, mainText, contentText, href, 
             text: "Proceed to delete",
             proceed: {
                 text: "Proceed",
-                onProceed: () => {
-                    console.log(`${deleteAction?.for} ${deleteAction?.id} deleted`)
+                onProceed: async () => {
+                    if (deleteAction?.for === "USERS") {
+                        const result = await deleteUserAction(deleteAction.id)
+                        if (!result.success) {
+                            toast.error(result.errors)
+                            setIsModalOpen(false)
+                            return
+                        }
+                        toast.success("User deleted")
+                        router.refresh()
+                    }
                     setIsModalOpen(false)
                 }
             }
