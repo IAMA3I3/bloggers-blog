@@ -1,8 +1,10 @@
+import { ObjectId } from "mongodb"
+
 export type PostCategory = "web-development" | "productivity" | "architecture" | "design" | "technology" | "tutorial" | "others"
 
 export type MediaType = "image" | "video"
 
-export type PostStatus = "published" | "draft"
+export type PostStatus = "published" | "draft" | "suspended"
 
 export type PostMedia = {
     url: string
@@ -20,7 +22,7 @@ export type PostFormData = {
 }
 
 export type Post = {
-    _id: string
+    _id: ObjectId
     title: string
     content: string
     userId: string
@@ -33,10 +35,12 @@ export type Post = {
 }
 
 export type PostComment = {
-    _id: string
+    _id: ObjectId
     postId: string
     userId: string
     content: string
     createdAt: Date
     updatedAt: Date
 }
+
+export type SafePost = Omit<Post, "_id"> & { id: string }

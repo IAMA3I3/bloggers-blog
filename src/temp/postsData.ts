@@ -37,7 +37,7 @@ export const mockPosts: Post[] = [
         userId: "user_2",
         category: "productivity",
         featured: false,
-        status: "published",
+        status: "suspended",
         media: [
             {
                 url: "https://picsum.photos/800/500?random=3",

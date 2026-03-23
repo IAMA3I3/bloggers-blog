@@ -2,14 +2,14 @@
 
 import { ActionListItem } from "@/components/ui/ListItem"
 import Pagination from "@/components/ui/Pagination"
-import { Post } from "@/types/post"
+import { SafePost } from "@/types/post"
 import { defaultMedia } from "@/utils/appStore"
 import { formatPostDate } from "@/utils/formatPostDate"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect } from "react"
 
 type PostsListClientProps = {
-    posts: Post[]
+    posts: SafePost[]
 }
 
 const POSTS_PER_PAGE = 10
@@ -50,17 +50,17 @@ export default function PostsListClient({ posts }: PostsListClientProps) {
             {
                 currentPosts.map(post => (
                     <ActionListItem
-                        key={post._id}
+                        key={post.id}
                         media={post.media[0] || defaultMedia}
                         mutedText={formatPostDate(post.createdAt)}
                         mainText={post.title}
                         contentText={post.content}
-                        href={`/dashboard/posts/${post._id}`}
-                        actionButton={{ action: "EDIT", href: `/dashboard/posts/${post._id}/edit` }}
-                        deleteAction={{ for: "POSTS", id: post._id }}
+                        href={`/dashboard/posts/${post.id}`}
+                        actionButton={{ action: "EDIT", href: `/dashboard/posts/${post.id}/edit` }}
+                        deleteAction={{ for: "POSTS", id: post.id }}
                         status={{
-                            variant: post.status === "published" ? "success" : "info",
-                            text: post.status === "published" ? "Published" : "Draft"
+                            variant: post.status === "published" ? "success" : post.status === "draft" ? "info" : "secondary",
+                            text: post.status === "published" ? "Published" : post.status === "draft" ? "Draft" : "Suspended"
                         }}
                     />
                 ))

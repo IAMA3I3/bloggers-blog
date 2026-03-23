@@ -81,8 +81,10 @@ async function PostDetailMain({ id }: { id: string }) {
                 {
                     post.status === "draft" ? (
                         <p className=" text-muted font-semibold">Post saved as draft</p>
-                    ) : (
+                    ) : post.status === "published" ? (
                         <p className=" text-muted font-semibold">Post published: <Link href={`/blog/${post._id}`} className=" text-primary hover:underline">View live</Link></p>
+                    ) : (
+                        <p className=" text-red-400 font-semibold">Post suspended, contact us for more details.</p>
                     )
                 }
             </section>

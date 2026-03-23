@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/Button";
 import Link from "next/link";
 import { Suspense } from "react";
 
+type PostsPageProps = {}
+
 export default function PostsPage() {
 
     return (

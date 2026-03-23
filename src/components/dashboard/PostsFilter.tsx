@@ -3,8 +3,9 @@
 import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { StateButton } from "../ui/Button"
+import { PostStatus } from "@/types/post"
 
-const filters = ["all", "draft", "published"]
+const filters: (PostStatus | "all")[] = ["all", "draft", "published", "suspended"]
 
 export default function PostsFilter() {
 
