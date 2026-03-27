@@ -23,7 +23,7 @@ const initialFormData: PostFormData = {
 
 const radioOptions: { text: string; value: PostStatus }[] = [
     { text: "Save as draft", value: "draft" },
-    { text: "Publish", value: "published" },
+    { text: "Publish", value: "published" }
 ]
 
 export default function PostForm({ initialData = initialFormData }: PostFormProps) {

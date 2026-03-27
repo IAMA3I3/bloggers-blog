@@ -44,3 +44,5 @@ export type PostComment = {
 }
 
 export type SafePost = Omit<Post, "_id"> & { id: string }
+
+export type SafeComment = Omit<PostComment, "_id"> & { id: string }
