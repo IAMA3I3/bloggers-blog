@@ -19,13 +19,14 @@ export type PostFormData = {
     content: string
     media?: File[]
     status: PostStatus
+    category: PostCategory
 }
 
 export type Post = {
     _id: ObjectId
     title: string
     content: string
-    userId: string
+    userId: ObjectId
     category: PostCategory
     featured: boolean
     media: PostMedia[] // Array of media files
@@ -37,12 +38,12 @@ export type Post = {
 export type PostComment = {
     _id: ObjectId
     postId: string
-    userId: string
+    userId: ObjectId
     content: string
     createdAt: Date
     updatedAt: Date
 }
 
-export type SafePost = Omit<Post, "_id"> & { id: string }
+export type SafePost = Omit<Post, "_id" | "userId"> & { id: string, userId: string }
 
-export type SafeComment = Omit<PostComment, "_id"> & { id: string }
+export type SafeComment = Omit<PostComment, "_id" | "userId"> & { id: string, userId: string }

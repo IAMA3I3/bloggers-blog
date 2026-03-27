@@ -5,6 +5,7 @@ import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react"
 import { FaAngleDown } from "react-icons/fa6"
 
 type DropSelectMenuProps = {
+    label?: string
     direction?: "to-bottom" | "to-top"
     position?: "start" | "end"
     value: string
@@ -14,7 +15,7 @@ type DropSelectMenuProps = {
     fullWidth?: boolean
 }
 
-export const DropSelectMenu = ({ direction = "to-bottom", position = "end", value, setValue, className, menuItems, fullWidth = false }: DropSelectMenuProps) => {
+export const DropSelectMenu = ({ label, direction = "to-bottom", position = "end", value, setValue, className, menuItems, fullWidth = false }: DropSelectMenuProps) => {
 
     const dropDownRef = useRef<HTMLDivElement | null>(null)
     const buttonRef = useRef<HTMLButtonElement | null>(null)
@@ -60,12 +61,14 @@ export const DropSelectMenu = ({ direction = "to-bottom", position = "end", valu
 
     return (
         <div className=" relative w-full">
+            <label htmlFor={label} className=" text-sm font-semibold text-muted">{label}</label>
             <button ref={buttonRef} type="button" onClick={toggleDropMenu} className=" relative w-full">
                 <input
                     type="text"
                     readOnly
                     value={dashedToCapitalized(value)}
                     className={className}
+                    id={label}
                 />
                 <FaAngleDown className={`${dropedMenu ? " rotate-180" : " rotate-0"} transition-all duration-500 w-4 h-4 absolute top-[50%] -translate-y-[50%] right-4 text-muted`} />
             </button>
