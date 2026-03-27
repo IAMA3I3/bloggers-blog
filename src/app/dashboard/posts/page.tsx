@@ -1,12 +1,20 @@
 import PostsList from "@/components/dashboard/posts-list/PostsList";
 import PostsFilter from "@/components/dashboard/PostsFilter";
 import { Button } from "@/components/ui/Button";
+import { PostStatus } from "@/types/post";
 import Link from "next/link";
 import { Suspense } from "react";
 
-type PostsPageProps = {}
+type PostsPageProps = {
+    searchParams: Promise<{
+        status?: string
+    }>
+}
 
-export default function PostsPage() {
+export default async function PostsPage({ searchParams }: PostsPageProps) {
+    const { status } = await searchParams
+    const validStatuses: (PostStatus | "all")[] = ["all", "draft", "published", "suspended"]
+    const resolvedStatus = validStatuses.includes(status as PostStatus) ? (status as PostStatus) : undefined
 
     return (
         <>
@@ -21,8 +29,8 @@ export default function PostsPage() {
             {/* posts filter */}
             <PostsFilter />
             {/* posts lists */}
-            <Suspense fallback={<SkeletonLoading />}>
-                <PostsList />
+            <Suspense fallback={<SkeletonLoading />} key={status}>
+                <PostsList status={resolvedStatus} />
             </Suspense>
         </>
     )
