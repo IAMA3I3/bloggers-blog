@@ -1,6 +1,6 @@
 "use client"
 
-import { PostCategory, PostFormData, PostStatus } from "@/types/post"
+import { PostCategory, PostFormData, PostMedia, PostStatus } from "@/types/post"
 import { Dispatch, FormEvent, SetStateAction, useEffect, useState } from "react"
 import { Input } from "../ui/Input"
 import RichTextEditor from "@/utils/Richtexteditor"
@@ -12,6 +12,7 @@ import { PostFormError, validatePost } from "@/utils/validators/createPostValida
 import { useRouter } from "next/navigation"
 import { createPostAction } from "@/actions/post"
 import { DropSelectMenu } from "../ui/DropMenu"
+import { uploadFileToCloudinary } from "@/lib/media/uploadToCloudinaryClient"
 
 type PostFormProps = {
     initialData?: PostFormData
@@ -71,13 +72,25 @@ export default function PostForm({ initialData = initialFormData }: PostFormProp
             return
         }
 
-        // Build FormData — the only way to send Files to a server action
+        // Upload media directly to Cloudinary from the client
+        let uploadedMedia: PostMedia[] = []
+        if (images && images.length > 0) {
+            try {
+                uploadedMedia = await Promise.all(images.map(uploadFileToCloudinary))
+            } catch {
+                setError({ media: "Media upload failed. Please try again." })
+                setIsLoading(false)
+                return
+            }
+        }
+
+        // Now send only text + uploaded URLs to the server action
         const formData = new FormData()
         formData.append("title", data.title)
         formData.append("content", data.content)
         formData.append("status", data.status)
         formData.append("category", data.category)
-        images?.forEach(file => formData.append("media", file))
+        formData.append("uploadedMedia", JSON.stringify(uploadedMedia))
 
         const result = await createPostAction(formData)
         if (!result.success) {

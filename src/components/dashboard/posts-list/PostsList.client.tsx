@@ -5,6 +5,7 @@ import Pagination from "@/components/ui/Pagination"
 import { SafePost } from "@/types/post"
 import { defaultMedia } from "@/utils/appStore"
 import { formatPostDate } from "@/utils/formatPostDate"
+import { stripHtml } from "@/utils/stripHTML"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect } from "react"
 
@@ -43,7 +44,7 @@ export default function PostsListClient({ posts }: PostsListClientProps) {
         })
     }, [currentPage])
 
-    if (currentPosts.length === 0) return <h3 className=" mt-4 text-3xl font-semibold text-center text-gray-400">No post yet</h3>
+    if (currentPosts.length === 0) return <h3 className=" mt-4 text-3xl font-semibold text-center text-gray-400">No post for this filter.</h3>
 
     return (
         <div className=" space-y-4">
@@ -54,7 +55,7 @@ export default function PostsListClient({ posts }: PostsListClientProps) {
                         media={post.media[0] || defaultMedia}
                         mutedText={formatPostDate(post.createdAt)}
                         mainText={post.title}
-                        contentText={post.content}
+                        contentText={stripHtml(post.content)}
                         href={`/dashboard/posts/${post.id}`}
                         actionButton={{ action: "EDIT", href: `/dashboard/posts/${post.id}/edit` }}
                         deleteAction={{ for: "POSTS", id: post.id }}

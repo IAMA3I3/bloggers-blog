@@ -2,10 +2,16 @@ import DeleteButton from "@/components/dashboard/DeleteButton"
 import BlogMedia from "@/components/sections/blog-posts/BlogMedia"
 import { Button } from "@/components/ui/Button"
 import { HeartTick } from "@/components/ui/Ticks"
-import { Post } from "@/types/post"
+import getAuthUser from "@/lib/auth/getAuthUser"
+import { getCollection } from "@/lib/db"
+import { SessionPayload } from "@/lib/sessions"
+import { User } from "@/types/auth"
+import { Post, SafePost } from "@/types/post"
 import { formatPostDate } from "@/utils/formatPostDate"
 import { dashedToCapitalized } from "@/utils/textFormat"
+import { ObjectId, WithId } from "mongodb"
 import Link from "next/link"
+import { notFound, redirect } from "next/navigation"
 import { Suspense } from "react"
 import { BiCommentDetail } from "react-icons/bi"
 import { FaEdit } from "react-icons/fa";
@@ -17,36 +23,60 @@ type PostDetailPageProps = {
 }
 
 export default async function PostDetailPage({ params }: PostDetailPageProps) {
+    const authUser = await getAuthUser()
+    if (!authUser) redirect("/sign-in")
 
     const { postId } = await params
 
     return (
         <>
             <Suspense fallback={<SkeletonLoading />}>
-                <PostDetailMain id={postId} />
+                <PostDetailMain id={postId} authUser={authUser} />
             </Suspense>
-            <div className=" container px-6 mx-auto flex gap-4">
-                <Link href={`/dashboard/posts/${postId}/edit`}>
-                    <Button
-                        text="Edit"
-                        icon={FaEdit}
-                    />
-                </Link>
-                {/* delete button */}
-                <DeleteButton id={postId} />
-            </div>
         </>
     )
 }
 
-async function PostDetailMain({ id }: { id: string }) {
-    await new Promise(res => setTimeout(res, 2000))
-    const post = mockPost // replace later
+const serializePost = (post: WithId<Post>): SafePost => {
+    return { ...post, id: post._id.toString(), userId: post.userId.toString() }
+}
+
+async function PostDetailMain({ id, authUser }: { id: string, authUser: SessionPayload }) {
+
+    let post: SafePost | null = null
+
+    try {
+        const postsCollection = await getCollection<Post>("posts")
+        if (!postsCollection) notFound()
+
+        const rawPost = await postsCollection.findOne({ _id: ObjectId.createFromHexString(id) })
+        if (!rawPost) notFound()
+
+        post = serializePost(rawPost)
+    } catch {
+        notFound()
+    }
+
+    if (authUser.role !== "admin" && post.userId !== authUser.userId) notFound()
+
+    let authorName: string | null = null
+
+    try {
+        const usersCollection = await getCollection<User>("users")
+        if (usersCollection) {
+            const user = await usersCollection.findOne({ _id: ObjectId.createFromHexString(post.userId) })
+            authorName = user?.username ?? null
+        }
+    } catch {
+        // non-critical, author name just won't show
+    }
+
+    const isOwner = authUser.role === "admin" || post.userId === authUser.userId
 
     return (
         <>
             <h2 className="text-2xl font-semibold mb-6 truncate">
-                <Link href={"/dashboard/posts"} className=" text-muted hover:text-primary">Posts</Link> {"/"} {id} {post.title}
+                <Link href={"/dashboard/posts"} className=" text-muted hover:text-primary">Posts</Link> {"/"} {post.title}
             </h2>
             <BlogMedia media={post.media} />
             {/* Meta */}
@@ -59,7 +89,7 @@ async function PostDetailMain({ id }: { id: string }) {
                     {formatPostDate(post.createdAt)}
                 </span>
                 <span>•</span>
-                <span>By Abdulazeez Salami</span>
+                <span>By {authorName}</span>
             </div>
             {/* Content */}
             <section className=" container my-12 px-6 mx-auto">
@@ -82,12 +112,20 @@ async function PostDetailMain({ id }: { id: string }) {
                     post.status === "draft" ? (
                         <p className=" text-muted font-semibold">Post saved as draft</p>
                     ) : post.status === "published" ? (
-                        <p className=" text-muted font-semibold">Post published: <Link href={`/blog/${post._id}`} className=" text-primary hover:underline">View live</Link></p>
+                        <p className=" text-muted font-semibold">Post published: <Link href={`/blog/${post.id}`} className=" text-primary hover:underline">View live</Link></p>
                     ) : (
                         <p className=" text-red-400 font-semibold">Post suspended, contact us for more details.</p>
                     )
                 }
             </section>
+            {isOwner && (
+                <div className="container px-6 mx-auto flex gap-4">
+                    <Link href={`/dashboard/posts/${id}/edit`}>
+                        <Button text="Edit" icon={FaEdit} />
+                    </Link>
+                    <DeleteButton id={id} />
+                </div>
+            )}
         </>
     )
 }
@@ -132,34 +170,4 @@ function SkeletonLoading() {
             </div>
         </>
     )
-}
-
-
-
-
-// mock — replace with DB fetch
-const mockPost: Post = {
-    _id: "1",
-    title: "Building a Modern Blog with Next.js",
-    content: `
-  <p>Next.js makes building modern content platforms fast and scalable.</p>
-  <p>This article explores architecture decisions, performance tips, and best practices.</p>
-  <h2>Why Next.js?</h2>
-  <p>Server components, SEO, and performance come out of the box.</p>
-  `,
-    userId: "user-1",
-    category: "web-development",
-    featured: true,
-    status: "published",
-    media: [
-        {
-            url: "https://picsum.photos/1200/700",
-            type: "image",
-            filename: "cover.jpg",
-            size: 120000,
-            uploadedAt: new Date(),
-        },
-    ],
-    createdAt: new Date(),
-    updatedAt: new Date(),
 }

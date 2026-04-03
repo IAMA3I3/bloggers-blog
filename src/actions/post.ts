@@ -2,7 +2,6 @@
 
 import getAuthUser from "@/lib/auth/getAuthUser";
 import { getCollection } from "@/lib/db";
-import { uploadToCloudinary } from "@/lib/media/cloudinary";
 import { ActionResponse } from "@/types/action";
 import { Post, PostFormData, PostMedia } from "@/types/post";
 import { PostFormError, validatePost } from "@/utils/validators/createPostValidator";
@@ -22,7 +21,7 @@ export async function createPostAction(formData: FormData): ActionResponse<(Post
         content: formData.get("content") as string,
         status: formData.get("status") as PostFormData["status"],
         category: formData.get("category") as PostFormData["category"],
-        media: formData.getAll("media").filter(f => f instanceof File && f.size > 0) as File[],
+        media: [],
     }
 
     // validate data
@@ -37,17 +36,10 @@ export async function createPostAction(formData: FormData): ActionResponse<(Post
     const existingTitle = await postsCollection.findOne({ title: data.title })
     if (existingTitle) return { success: false, data, errors: { title: "A post with this title already exists" } }
 
-    // Upload all media files to Cloudinary in parallel
-    let uploadedMedia: PostMedia[] = []
-    if (data.media && data.media.length > 0) {
-        try {
-            const result = await Promise.all(data.media.map(uploadToCloudinary))
-            const now = new Date()
-            uploadedMedia = result.map(r => ({ ...r, uploadedAt: now }))
-        } catch {
-            return { success: false, data, errors: { media: "Media upload failed. Please try again." } }
-        }
-    }
+    // Parse the already-uploaded media URLs — no file upload needed here
+    const uploadedMedia: PostMedia[] = JSON.parse(
+        formData.get("uploadedMedia") as string || "[]"
+    )
 
     // now
     const now = new Date()
