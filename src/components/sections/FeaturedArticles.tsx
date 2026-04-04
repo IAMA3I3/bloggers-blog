@@ -3,6 +3,10 @@ import { FeaturedPostCard } from "../posts/PostCard";
 import Link from "next/link";
 import { Button } from "../ui/Button";
 import { FaArrowRight } from "react-icons/fa6";
+import { Post, SafePost } from "@/types/post";
+import { WithId } from "mongodb";
+import { getCollection } from "@/lib/db";
+import { stripHtml } from "@/utils/stripHTML";
 
 export default function FeaturedArticles() {
 
@@ -36,22 +40,34 @@ export default function FeaturedArticles() {
     )
 }
 
+const serializePosts = (posts: WithId<Post>[]): SafePost[] => {
+    return posts.map(({ _id, userId, ...rest }) => ({ ...rest, id: _id.toString(), userId: userId.toString() }))
+}
+
 async function FeaturedPostCards() {
 
-    await new Promise(res => setTimeout(res, 3000))
+    let posts: SafePost[] = []
+
+    try {
+        const postsCollection = await getCollection<Post>("posts")
+        const rawPosts = await postsCollection.find().sort({ createdAt: -1 }).limit(3).toArray()
+        posts = serializePosts(rawPosts)
+    } catch {
+        throw new Error("Failed to load posts")
+    }
 
     return (
         <div className="grid gap-8 lg:grid-cols-10">
             {/* main */}
             <div className=" lg:col-span-6">
                 <FeaturedPostCard
-                    category="web-development"
-                    id="building-scalable-applications-with-next-js-app-router"
-                    media={[]}
-                    title="Building scalable applications with Next.js App Router"
-                    content="A practical guide to structuring modern Next.js applications using Server Components, Server Actions, and best practices."
+                    category={posts[0].category}
+                    id={posts[0].id}
+                    media={posts[0].media}
+                    title={posts[0].title}
+                    content={stripHtml(posts[0].content)}
                     authorName="Ali_Baba"
-                    createdAt={new Date("2026-02-03T12:06:32Z")}
+                    createdAt={posts[0].createdAt}
                 />
             </div>
             <div className=" lg:col-span-4 space-y-8">
