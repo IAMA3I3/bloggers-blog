@@ -29,6 +29,7 @@ export default function RestoreButton({ id }: RestoreButtonProps) {
                         toast.error(result.errors)
                     }
                     setIsModalOpen(false)
+                    toast.success("Post restored")
                     router.refresh()
                 }
             }

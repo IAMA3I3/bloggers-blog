@@ -29,6 +29,7 @@ export default function SuspendButton({ id }: SuspendButtonProps) {
                         toast.error(result.errors)
                     }
                     setIsModalOpen(false)
+                    toast.success("Post suspended")
                     router.refresh()
                 }
             }
