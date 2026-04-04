@@ -1,9 +1,12 @@
-import { Post } from "@/types/post";
+import { Post, SafePost } from "@/types/post";
 import { BasicCard } from "../containers/Cards";
 import { LinkListItem } from "../ui/ListItem";
 import { formatPostDate } from "@/utils/formatPostDate";
 import { Suspense } from "react";
-import { mockPosts } from "@/temp/postsData";
+import getAuthUser from "@/lib/auth/getAuthUser";
+import { ObjectId, WithId } from "mongodb";
+import { getCollection } from "@/lib/db";
+import { redirect } from "next/navigation";
 
 export default function RecentPosts() {
 
@@ -19,21 +22,34 @@ export default function RecentPosts() {
     )
 }
 
+const serializePosts = (posts: WithId<Post>[]): SafePost[] => {
+    return posts.map(({ _id, userId, ...rest }) => ({ ...rest, id: _id.toString(), userId: userId.toString() }))
+}
+
 async function RenderPosts() {
 
-    await new Promise(res => setTimeout(res, 5000))
+    const authUser = await getAuthUser()
+    if (!authUser) redirect("sign-in")
 
-    const posts: Post[] = mockPosts
+    let posts: SafePost[] = []
+
+    try {
+        const postsCollection = await getCollection<Post>("posts")
+        const rawPosts = authUser.role === "admin" ? await postsCollection.find().sort({ createdAt: -1 }).limit(3).toArray() : await postsCollection.find({ userId: ObjectId.createFromHexString(authUser.userId) }).sort({ createdAt: -1 }).limit(3).toArray()
+        posts = serializePosts(rawPosts)
+    } catch {
+        throw new Error("Error loading posts")
+    }
 
     return (
         <div className=" space-y-2">
             {
                 posts.length === 0 ? (
                     <h6 className=" text-gray-500 text-lg text-center font-semibold">No post yet</h6>
-                ) : posts.slice(0, 3).map(post => (
+                ) : posts.map(post => (
                     <LinkListItem
-                        key={post._id}
-                        href={`/dashboard/posts/${post._id}`}
+                        key={post.id}
+                        href={`/dashboard/posts/${post.id}`}
                         mutedText={formatPostDate(post.createdAt)}
                         text={post.title}
                         shadow
