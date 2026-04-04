@@ -36,3 +36,18 @@ export async function uploadToCloudinary(file: File): Promise<{
         stream.end(buffer)
     })
 }
+
+export async function deleteFromCloudinary(url: string): Promise<void> {
+    // Extract public_id from the Cloudinary URL
+    // e.g. https://res.cloudinary.com/cloud/image/upload/v123456/posts/filename.jpg
+    //                                                                 ^^^^^^^^^^^^^^^^^ this is the public_id
+    const matches = url.match(/\/upload\/(?:v\d+\/)?(.+)\.[^.]+$/)
+    if (!matches) throw new Error(`Could not extract public_id from URL: ${url}`)
+
+    const publicId = matches[1] // e.g. "posts/filename"
+    const isVideo = url.includes("/video/upload/")
+
+    await cloudinary.uploader.destroy(publicId, {
+        resource_type: isVideo ? "video" : "image"
+    })
+}

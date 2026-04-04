@@ -2,6 +2,7 @@
 
 import getAuthUser from "@/lib/auth/getAuthUser";
 import { getCollection } from "@/lib/db";
+import { deleteFromCloudinary } from "@/lib/media/cloudinary";
 import { ActionResponse } from "@/types/action";
 import { Post, PostFormData, PostMedia } from "@/types/post";
 import { PostFormError, validatePost } from "@/utils/validators/createPostValidator";
@@ -186,6 +187,42 @@ export async function restorePostAction(postId: string): ActionResponse<string, 
             }
         }
     )
+
+    return { success: true, data: postId, errors: "" }
+}
+
+export async function deletePostAction(postId: string): ActionResponse<string, string> {
+    const authUser = await getAuthUser()
+    if (!authUser) redirect("/sign-in")
+
+    const postsCollection = await getCollection<Post>("posts")
+    if (!postsCollection) return {
+        success: false,
+        data: postId,
+        errors: "Service temporarily unavailable"
+    }
+
+    // Check post exists and user owns it
+    const existing = await postsCollection.findOne({ _id: ObjectId.createFromHexString(postId) })
+    if (!existing) return {
+        success: false,
+        data: postId,
+        errors: "Post not found"
+    }
+
+    if (authUser.role !== "admin" && existing.userId.toString() !== authUser.userId) redirect("/sign-in")
+
+    if (authUser.role !== "admin" && existing.status === "suspended") return {
+        success: false,
+        data: postId,
+        errors: "Suspended posts cannot be deleted"
+    }
+
+    if (existing.media && existing.media.length > 0) {
+        await Promise.allSettled(existing.media.map(m => deleteFromCloudinary(m.url)))
+    }
+
+    await postsCollection.deleteOne({ _id: ObjectId.createFromHexString(postId) })
 
     return { success: true, data: postId, errors: "" }
 }

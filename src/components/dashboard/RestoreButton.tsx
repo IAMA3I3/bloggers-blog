@@ -27,6 +27,8 @@ export default function RestoreButton({ id }: RestoreButtonProps) {
                     const result = await restorePostAction(id)
                     if (!result.success) {
                         toast.error(result.errors)
+                        setIsModalOpen(false)
+                        return
                     }
                     setIsModalOpen(false)
                     toast.success("Post restored")

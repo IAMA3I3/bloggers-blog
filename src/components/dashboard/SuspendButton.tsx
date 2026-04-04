@@ -27,6 +27,8 @@ export default function SuspendButton({ id }: SuspendButtonProps) {
                     const result = await suspendPostAction(id)
                     if (!result.success) {
                         toast.error(result.errors)
+                        setIsModalOpen(false)
+                        return
                     }
                     setIsModalOpen(false)
                     toast.success("Post suspended")
