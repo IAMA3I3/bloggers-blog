@@ -111,3 +111,81 @@ export async function updatePostAction(postId: string, formData: FormData): Acti
 
     return { success: true, data: { ...data, id: postId }, errors: {} }
 }
+
+export async function suspendPostAction(postId: string): ActionResponse<string, string> {
+    const authUser = await getAuthUser()
+    if (!authUser) redirect("/sign-in")
+    if (authUser.role !== "admin") redirect("/sign-in")
+
+    const postsCollection = await getCollection<Post>("posts")
+    if (!postsCollection) return {
+        success: false,
+        data: postId,
+        errors: "Service temporarily unavailable"
+    }
+
+    // check post exists
+    const existingPost = await postsCollection.findOne({ _id: ObjectId.createFromHexString(postId) })
+    if (!existingPost) return {
+        success: false,
+        data: postId,
+        errors: "Post not found"
+    }
+
+    if (existingPost.status === "suspended") return {
+        success: false,
+        data: postId,
+        errors: "Post is already suspended"
+    }
+
+    await postsCollection.updateOne(
+        { _id: ObjectId.createFromHexString(postId) },
+        {
+            $set: {
+                status: "suspended",
+                updatedAt: new Date()
+            }
+        }
+    )
+
+    return { success: true, data: postId, errors: "" }
+}
+
+export async function restorePostAction(postId: string): ActionResponse<string, string> {
+    const authUser = await getAuthUser()
+    if (!authUser) redirect("/sign-in")
+    if (authUser.role !== "admin") redirect("/sign-in")
+
+    const postsCollection = await getCollection<Post>("posts")
+    if (!postsCollection) return {
+        success: false,
+        data: postId,
+        errors: "Service temporarily unavailable"
+    }
+
+    // check post exists
+    const existingPost = await postsCollection.findOne({ _id: ObjectId.createFromHexString(postId) })
+    if (!existingPost) return {
+        success: false,
+        data: postId,
+        errors: "Post not found"
+    }
+
+    if (existingPost.status !== "suspended") return {
+        success: false,
+        data: postId,
+        errors: "Post is not suspended"
+    }
+
+    await postsCollection.updateOne(
+        { _id: ObjectId.createFromHexString(postId) },
+        {
+            $set: {
+                status: "published",
+                updatedAt: new Date()
+            }
+        }
+    )
+
+    return { success: true, data: postId, errors: "" }
+}

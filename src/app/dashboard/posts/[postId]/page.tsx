@@ -1,4 +1,5 @@
 import DeleteButton from "@/components/dashboard/DeleteButton"
+import RestoreButton from "@/components/dashboard/RestoreButton"
 import SuspendButton from "@/components/dashboard/SuspendButton"
 import BlogMedia from "@/components/sections/blog-posts/BlogMedia"
 import { Button } from "@/components/ui/Button"
@@ -125,8 +126,13 @@ async function PostDetailMain({ id, authUser }: { id: string, authUser: SessionP
                         <Button text="Edit" icon={FaEdit} />
                     </Link>
                     {
-                        authUser.role === "admin" && (
+                        authUser.role === "admin" && post.status !== "suspended" && (
                             <SuspendButton id={id} />
+                        )
+                    }
+                    {
+                        authUser.role === "admin" && post.status === "suspended" && (
+                            <RestoreButton id={id} />
                         )
                     }
                     <DeleteButton id={id} />

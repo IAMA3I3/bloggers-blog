@@ -2,21 +2,21 @@
 
 import { useStateContext } from "@/context/StateContext";
 import { Button } from "../ui/Button"
-import { AiOutlineStop } from "react-icons/ai";
-import { suspendPostAction } from "@/actions/post";
+import { FaCheck } from "react-icons/fa";
+import { restorePostAction } from "@/actions/post";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
-type SuspendButtonProps = {
+type RestoreButtonProps = {
     id: string
 }
 
-export default function SuspendButton({ id }: SuspendButtonProps) {
+export default function RestoreButton({ id }: RestoreButtonProps) {
     const router = useRouter()
 
     const { setIsModalOpen, setModalProps } = useStateContext()
 
-    const onSuspend = () => {
+    const onRestore = () => {
         setModalProps({
             title: "Suspend",
             text: "Proceed to suspend",
@@ -24,7 +24,7 @@ export default function SuspendButton({ id }: SuspendButtonProps) {
                 text: "Proceed",
                 onProceed: async () => {
                     // console.log(`${from} ${id} suspended`)
-                    const result = await suspendPostAction(id)
+                    const result = await restorePostAction(id)
                     if (!result.success) {
                         toast.error(result.errors)
                     }
@@ -37,6 +37,6 @@ export default function SuspendButton({ id }: SuspendButtonProps) {
     }
 
     return (
-        <Button text="Suspend" icon={AiOutlineStop} variant="secondary" outlined onClick={onSuspend} />
+        <Button text="Restore" icon={FaCheck} variant="secondary" outlined onClick={onRestore} />
     )
 }
