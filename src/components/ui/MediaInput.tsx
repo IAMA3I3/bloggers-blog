@@ -1,5 +1,6 @@
 "use client"
 
+import { PostMedia } from "@/types/post"
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react"
 import { FiUpload, FiX } from "react-icons/fi"
 
@@ -9,6 +10,8 @@ type MediaInputType = {
     mediaType?: "image" | "video" | "mixed"
     media?: File
     setMedia?: Dispatch<SetStateAction<File | undefined>>
+    existingMedia?: PostMedia[]
+    setExistingMedia?: Dispatch<SetStateAction<PostMedia[]>>
     error?: string
 } | {
     variant: "multiple"
@@ -16,6 +19,8 @@ type MediaInputType = {
     mediaType?: "image" | "video" | "mixed"
     media?: File[]
     setMedia?: Dispatch<SetStateAction<File[] | undefined>>
+    existingMedia?: PostMedia[]
+    setExistingMedia?: Dispatch<SetStateAction<PostMedia[]>>
     error?: string
 }
 
@@ -48,10 +53,39 @@ function MediaPreview({ url, file, onRemove }: { url: string; file: File; onRemo
     )
 }
 
-export function MediaInput({ variant, id, mediaType = "mixed", media, setMedia, error }: MediaInputType) {
+// Separate preview for already-uploaded PostMedia
+function ExistingMediaPreview({ item, onRemove }: { item: PostMedia; onRemove: () => void }) {
+    return (
+        <div className="relative h-full aspect-square rounded overflow-hidden shrink-0 group">
+            {item.type === "video" ? (
+                <video src={item.url} autoPlay loop muted playsInline className="w-full h-full object-cover" />
+            ) : (
+                <img src={item.url} alt={item.filename} className="w-full h-full object-cover" />
+            )}
+            {/* "Saved" badge so users can distinguish existing from new */}
+            <span className="absolute bottom-1 left-1 text-[9px] font-bold uppercase bg-black/60 text-white px-1 py-0.5 rounded leading-none pointer-events-none">
+                saved
+            </span>
+            <button
+                type="button"
+                onClick={onRemove}
+                className="absolute top-1 right-1 bg-black/60 hover:bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                aria-label="Remove existing media"
+            >
+                <FiX size={12} />
+            </button>
+        </div>
+    )
+}
+
+export function MediaInput({ variant, id, mediaType = "mixed", media, setMedia, existingMedia, setExistingMedia, error }: MediaInputType) {
     const inputRef = useRef<HTMLInputElement>(null)
     const accept = getAccept(mediaType)
     const [previews, setPreviews] = useState<PreviewEntry[]>([])
+
+    const hasExisting = existingMedia && existingMedia.length > 0
+    const hasNew = previews.length > 0
+    const isEmpty = !hasExisting && !hasNew
 
     // Revoke all URLs on unmount
     useEffect(() => () => { previews.forEach(p => URL.revokeObjectURL(p.url)) }, []) // eslint-disable-line
@@ -77,7 +111,7 @@ export function MediaInput({ variant, id, mediaType = "mixed", media, setMedia, 
         if (inputRef.current) inputRef.current.value = ""
     }
 
-    function removeAt(index: number) {
+    function removeNewAt(index: number) {
         URL.revokeObjectURL(previews[index].url)
         setPreviews(prev => prev.filter((_, i) => i !== index))
 
@@ -88,6 +122,10 @@ export function MediaInput({ variant, id, mediaType = "mixed", media, setMedia, 
                 prev => prev?.filter((_, i) => i !== index)
             )
         }
+    }
+
+    function removeExistingAt(index: number) {
+        setExistingMedia?.(prev => prev.filter((_, i) => i !== index))
     }
 
     return (
@@ -104,13 +142,28 @@ export function MediaInput({ variant, id, mediaType = "mixed", media, setMedia, 
                     h-24 rounded-lg border-2 border-border p-2 relative
                 `}
                 >
-                    {previews.length === 0 && <p className=" text-xs font-semibold text-muted absolute top-[50%] -translate-y-[50%] left-[50%] -translate-x-[50%] text-center">Media preview</p>}
+                    {isEmpty && (
+                        <p className="text-xs font-semibold text-muted absolute top-[50%] -translate-y-[50%] left-[50%] -translate-x-[50%] text-center">
+                            Media preview
+                        </p>
+                    )}
+
+                    {/* Existing uploaded media — shown first */}
+                    {existingMedia?.map((item, i) => (
+                        <ExistingMediaPreview
+                            key={item.url}
+                            item={item}
+                            onRemove={() => removeExistingAt(i)}
+                        />
+                    ))}
+
+                    {/* Newly picked files */}
                     {previews.map((entry, i) => (
                         <MediaPreview
                             key={entry.url}
                             url={entry.url}
                             file={entry.file}
-                            onRemove={() => removeAt(i)}
+                            onRemove={() => removeNewAt(i)}
                         />
                     ))}
                 </div>
@@ -134,18 +187,16 @@ export function MediaInput({ variant, id, mediaType = "mixed", media, setMedia, 
                     </label>
                 </div>
             </div>
-            {
-                error && (
-                    <p
-                        className={`
-                            ${variant === "single" ? " sm:text-left" : ""}
-                            text-sm font-semibold text-red-400 text-center
-                        `}
-                    >
-                        {error}
-                    </p>
-                )
-            }
+            {error && (
+                <p
+                    className={`
+                        ${variant === "single" ? "sm:text-left" : ""}
+                        text-sm font-semibold text-red-400 text-center
+                    `}
+                >
+                    {error}
+                </p>
+            )}
         </div>
     )
 }

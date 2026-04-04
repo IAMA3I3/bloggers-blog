@@ -18,6 +18,7 @@ export type PostFormData = {
     title: string
     content: string
     media?: File[]
+    existingMedia?: PostMedia[] // already uploaded, from DB
     status: PostStatus
     category: PostCategory
 }

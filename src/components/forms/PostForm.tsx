@@ -10,12 +10,14 @@ import { Button } from "../ui/Button"
 import toast from "react-hot-toast"
 import { PostFormError, validatePost } from "@/utils/validators/createPostValidator"
 import { useRouter } from "next/navigation"
-import { createPostAction } from "@/actions/post"
+import { createPostAction, updatePostAction } from "@/actions/post"
 import { DropSelectMenu } from "../ui/DropMenu"
 import { uploadFileToCloudinary } from "@/lib/media/uploadToCloudinaryClient"
 
 type PostFormProps = {
     initialData?: PostFormData
+    isEdit?: boolean
+    postId?: string
 }
 
 const initialFormData: PostFormData = {
@@ -32,13 +34,15 @@ const radioOptions: { text: string; value: PostStatus }[] = [
 
 const categories: PostCategory[] = ["architecture", "design", "productivity", "technology", "tutorial", "web-development", "others"]
 
-export default function PostForm({ initialData = initialFormData }: PostFormProps) {
+export default function PostForm({ initialData = initialFormData, isEdit = false, postId }: PostFormProps) {
 
     const router = useRouter()
 
     const [data, setData] = useState(initialData)
     const [richTextContent, setRichTextContent] = useState(initialData.content)
     const [images, setImages] = useState<File[] | undefined>(initialData.media)
+    // Tracks existing uploaded media the user wants to keep
+    const [existingMedia, setExistingMedia] = useState<PostMedia[]>(initialData.existingMedia ?? [])
     const [radioValue, setRadioValue] = useState<PostStatus>(initialData.status)
     const [category, setCategory] = useState<PostCategory>(initialData.category)
     const [isLoading, setIsLoading] = useState(false)
@@ -65,14 +69,13 @@ export default function PostForm({ initialData = initialFormData }: PostFormProp
         setIsLoading(true)
 
         const { isValid, errors } = validatePost(data)
-
         if (!isValid) {
             setError(errors)
             setIsLoading(false)
             return
         }
 
-        // Upload media directly to Cloudinary from the client
+        // Upload any new files directly to Cloudinary from the client
         let uploadedMedia: PostMedia[] = []
         if (images && images.length > 0) {
             try {
@@ -84,7 +87,6 @@ export default function PostForm({ initialData = initialFormData }: PostFormProp
             }
         }
 
-        // Now send only text + uploaded URLs to the server action
         const formData = new FormData()
         formData.append("title", data.title)
         formData.append("content", data.content)
@@ -92,6 +94,25 @@ export default function PostForm({ initialData = initialFormData }: PostFormProp
         formData.append("category", data.category)
         formData.append("uploadedMedia", JSON.stringify(uploadedMedia))
 
+        if (isEdit && postId) {
+            // Send which existing media to keep (user may have removed some)
+            formData.append("keptMedia", JSON.stringify(existingMedia))
+
+            const result = await updatePostAction(postId, formData)
+            if (!result.success) {
+                setError(result.errors)
+                setIsLoading(false)
+                return
+            }
+
+            setIsLoading(false)
+            setError({})
+            toast.success(data.status === "draft" ? "Draft updated" : "Post updated")
+            router.replace(`/dashboard/posts/${postId}`)
+            return
+        }
+
+        // Create flow
         const result = await createPostAction(formData)
         if (!result.success) {
             setError(result.errors)
@@ -104,13 +125,14 @@ export default function PostForm({ initialData = initialFormData }: PostFormProp
         setData(initialData)
         setRichTextContent(initialData.content)
         setImages(initialData.media)
+        setExistingMedia(initialData.existingMedia ?? [])
         setRadioValue(initialData.status)
         toast.success(data.status === "draft" ? "Saved as draft" : "Published")
         router.replace(`/dashboard/posts/${result.data.id}`)
     }
 
     return (
-        <form onSubmit={onFormSubmit} className=" w-full space-y-4">
+        <form onSubmit={onFormSubmit} className="w-full space-y-4">
             <Input
                 variant="secondary"
                 label="Title"
@@ -127,16 +149,30 @@ export default function PostForm({ initialData = initialFormData }: PostFormProp
                 setValue={setCategory as Dispatch<SetStateAction<string>>}
                 menuItems={categories}
                 fullWidth
-                className=" w-full text-sm bg-transparent py-2 px-4 rounded-lg border-2 border-border focus:border-primary outline-none"
+                className="w-full text-sm bg-transparent py-2 px-4 rounded-lg border-2 border-border focus:border-primary outline-none"
             />
-            <MediaInput variant="multiple" id="multiple" media={images} setMedia={setImages} error={error.media} />
+            <MediaInput
+                variant="multiple"
+                id="multiple"
+                media={images}
+                setMedia={setImages}
+                existingMedia={existingMedia}
+                setExistingMedia={setExistingMedia}
+                error={error.media}
+            />
             <RadioInput
                 value={radioValue}
                 setValue={setRadioValue as Dispatch<SetStateAction<string>>}
                 options={radioOptions}
             />
-            <div className=" flex justify-center">
-                <Button type="submit" text="Submit" rounded size="large" isLoading={isLoading} />
+            <div className="flex justify-center">
+                <Button
+                    type="submit"
+                    text={isEdit ? "Update" : "Submit"}
+                    rounded
+                    size="large"
+                    isLoading={isLoading}
+                />
             </div>
         </form>
     )

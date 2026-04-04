@@ -1,4 +1,5 @@
 import DeleteButton from "@/components/dashboard/DeleteButton"
+import SuspendButton from "@/components/dashboard/SuspendButton"
 import BlogMedia from "@/components/sections/blog-posts/BlogMedia"
 import { Button } from "@/components/ui/Button"
 import { HeartTick } from "@/components/ui/Ticks"
@@ -123,6 +124,11 @@ async function PostDetailMain({ id, authUser }: { id: string, authUser: SessionP
                     <Link href={`/dashboard/posts/${id}/edit`}>
                         <Button text="Edit" icon={FaEdit} />
                     </Link>
+                    {
+                        authUser.role === "admin" && (
+                            <SuspendButton id={id} />
+                        )
+                    }
                     <DeleteButton id={id} />
                 </div>
             )}

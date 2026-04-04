@@ -1,7 +1,12 @@
 import { PageCard } from "@/components/containers/Cards"
 import PostForm from "@/components/forms/PostForm"
-import { Post, PostFormData } from "@/types/post"
+import getAuthUser from "@/lib/auth/getAuthUser"
+import { getCollection } from "@/lib/db"
+import { SessionPayload } from "@/lib/sessions"
+import { Post, PostFormData, SafePost } from "@/types/post"
+import { ObjectId, WithId } from "mongodb"
 import Link from "next/link"
+import { notFound, redirect } from "next/navigation"
 import { Suspense } from "react"
 
 type EditPageProps = {
@@ -11,37 +16,55 @@ type EditPageProps = {
 }
 
 export default async function EditPage({ params }: EditPageProps) {
-
+    const authUser = await getAuthUser()
+    if (!authUser) redirect("/sign-in")
     const { postId } = await params
 
     return (
         <Suspense fallback={<SkeletonLoading />}>
-            <RenderPostsEdit id={postId} />
+            <RenderPostsEdit id={postId} authUser={authUser} />
         </Suspense>
     )
 }
 
-async function RenderPostsEdit({ id }: { id: string }) {
+const serializePost = (post: WithId<Post>): SafePost => {
+    return { ...post, id: post._id.toString(), userId: post.userId.toString() }
+}
 
-    await new Promise(res => setTimeout(res, 2000))
+async function RenderPostsEdit({ id, authUser }: { id: string, authUser: SessionPayload }) {
 
-    const post = mockPost
+    let post: SafePost | null = null
+
+    try {
+        const postsCollection = await getCollection<Post>("posts")
+        if (!postsCollection) notFound()
+
+        const rawPost = await postsCollection.findOne({ _id: ObjectId.createFromHexString(id) })
+        if (!rawPost) notFound()
+
+        post = serializePost(rawPost)
+    } catch {
+        notFound()
+    }
+
+    if (authUser.role !== "admin" && post.userId !== authUser.userId) notFound()
 
     const initialFormData: PostFormData = {
         title: post.title,
         content: post.content,
-        // media: post.media
-        status: post.status
+        existingMedia: post.media,
+        status: post.status,
+        category: post.category
     }
 
     return (
         <>
             <h2 className="text-2xl font-semibold mb-6">
-                <Link href={"/dashboard/posts"} className=" text-muted hover:text-primary">Posts</Link> {"/"} <Link href={`/dashboard/posts/${id}`} className=" text-muted hover:text-primary">{id}</Link> {"/"} Edit
+                <Link href={"/dashboard/posts"} className=" text-muted hover:text-primary">Posts</Link> {"/"} <Link href={`/dashboard/posts/${id}`} className=" text-muted hover:text-primary">{post.title}</Link> {"/"} Edit
             </h2>
             <PageCard centerAlign>
                 <h3 className=" text-center text-2xl mb-4">Update Post</h3>
-                <PostForm initialData={initialFormData} />
+                <PostForm initialData={initialFormData} isEdit postId={id} />
             </PageCard>
         </>
     )
@@ -63,32 +86,4 @@ function SkeletonLoading() {
             </div>
         </>
     )
-}
-
-
-// mock — replace with DB fetch
-const mockPost: Post = {
-    _id: "1",
-    title: "Building a Modern Blog with Next.js",
-    content: `
-  <p>Next.js makes building modern content platforms fast and scalable.</p>
-  <p>This article explores architecture decisions, performance tips, and best practices.</p>
-  <h2>Why Next.js?</h2>
-  <p>Server components, SEO, and performance come out of the box.</p>
-  `,
-    userId: "user-1",
-    category: "web-development",
-    featured: true,
-    status: "published",
-    media: [
-        {
-            url: "https://picsum.photos/1200/700",
-            type: "image",
-            filename: "cover.jpg",
-            size: 120000,
-            uploadedAt: new Date(),
-        },
-    ],
-    createdAt: new Date(),
-    updatedAt: new Date(),
 }
