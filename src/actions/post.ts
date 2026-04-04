@@ -100,7 +100,8 @@ export async function updatePostAction(postId: string, formData: FormData): Acti
             $set: {
                 title: data.title,
                 content: data.content,
-                status: data.status,
+                // If currently suspended, lock the status — only admin can lift it later
+                status: existing.status === "suspended" ? "suspended" : data.status,
                 category: data.category,
                 media: finalMedia,
                 updatedAt: new Date()
