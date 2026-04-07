@@ -1,9 +1,10 @@
-import Chart from "@/components/dashboard/Chart";
+import ChartServer from "@/components/dashboard/Chart.server";
 import QuickLinks from "@/components/dashboard/QuickLinks";
 import RecentPosts from "@/components/dashboard/RecentPosts";
 import Stats from "@/components/dashboard/Stats";
+import { Suspense } from "react";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
 
     return (
         <>
@@ -14,7 +15,9 @@ export default function DashboardPage() {
                 {/* stats */}
                 <Stats />
                 {/* chart */}
-                <Chart />
+                <Suspense fallback={"Loading Chart ..."}>
+                    <ChartServer />
+                </Suspense>
                 <div className=" flex gap-8 flex-col md:flex-row *:w-full">
                     <RecentPosts />
                     <QuickLinks />
