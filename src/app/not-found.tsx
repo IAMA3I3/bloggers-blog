@@ -16,7 +16,6 @@ export default function NotFound() {
                     <Button text="Home" icon={GoHomeFill} variant="secondary" />
                 </Link>
             </div>
-            <Footer />
         </main>
     )
 }

@@ -83,7 +83,6 @@ export default async function BlogDetails({ params }: BlogDetailProps) {
             <Suspense fallback={<SkeletonLoading />}>
                 <BlogDetailMain id={blogId} />
             </Suspense>
-            <RelatedPosts blogId={blogId} />
         </article>
     )
 }
@@ -168,6 +167,7 @@ async function BlogDetailMain({ id }: { id: string }) {
                     </Suspense>
                 </div>
             </section>
+            <RelatedPosts id={post.id} category={post.category} />
         </>
     )
 }

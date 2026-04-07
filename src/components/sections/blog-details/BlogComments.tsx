@@ -1,11 +1,11 @@
-import { PostComment } from "@/types/post"
+import { SafeComment } from "@/types/post"
 import { BasicCard } from "../../containers/Cards"
 import { formatPostDate } from "@/utils/formatPostDate"
 
 export default async function BlogComments() {
     await new Promise(res => setTimeout(res, 2000))
 
-    const comments = mockComments
+    const comments: SafeComment[] = []
 
     return (
         <div className=" grid gap-8 grid-cols-1 md:grid-cols-2">
@@ -16,7 +16,7 @@ export default async function BlogComments() {
             }
             {
                 comments.map(comment => (
-                    <BasicCard key={comment._id}>
+                    <BasicCard key={comment.id}>
                         <p className=" text-xs font-semibold text-primary">UserName</p>
                         <p className=" text-xs font-semibold text-muted mb-2">{formatPostDate(comment.createdAt)}</p>
                         <p className=" text-sm">{comment.content}</p>
@@ -27,9 +27,9 @@ export default async function BlogComments() {
     )
 }
 
-const mockComments: PostComment[] = [
+const mockComments: SafeComment[] = [
     {
-        _id: "c1",
+        id: "c1",
         postId: "1",
         userId: "user_7",
         content:
@@ -38,7 +38,7 @@ const mockComments: PostComment[] = [
         updatedAt: new Date("2024-10-11T18:20:00"),
     },
     {
-        _id: "c2",
+        id: "c2",
         postId: "1",
         userId: "user_8",
         content:
@@ -47,7 +47,7 @@ const mockComments: PostComment[] = [
         updatedAt: new Date("2024-10-12T09:40:00"),
     },
     {
-        _id: "c3",
+        id: "c3",
         postId: "3",
         userId: "user_9",
         content:
@@ -56,7 +56,7 @@ const mockComments: PostComment[] = [
         updatedAt: new Date("2024-08-19T14:10:00"),
     },
     {
-        _id: "c4",
+        id: "c4",
         postId: "5",
         userId: "user_10",
         content:
@@ -65,7 +65,7 @@ const mockComments: PostComment[] = [
         updatedAt: new Date("2024-06-10T11:05:00"),
     },
     {
-        _id: "c5",
+        id: "c5",
         postId: "7",
         userId: "user_11",
         content:
@@ -74,7 +74,7 @@ const mockComments: PostComment[] = [
         updatedAt: new Date("2024-04-03T17:30:00"),
     },
     {
-        _id: "c6",
+        id: "c6",
         postId: "9",
         userId: "user_12",
         content:
@@ -83,7 +83,7 @@ const mockComments: PostComment[] = [
         updatedAt: new Date("2024-02-02T13:45:00"),
     },
     {
-        _id: "c7",
+        id: "c7",
         postId: "13",
         userId: "user_13",
         content:
@@ -92,7 +92,7 @@ const mockComments: PostComment[] = [
         updatedAt: new Date("2023-09-15T18:00:00"),
     },
     {
-        _id: "c8",
+        id: "c8",
         postId: "16",
         userId: "user_14",
         content:
