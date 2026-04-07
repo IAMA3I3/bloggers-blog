@@ -32,7 +32,7 @@ export default async function Stats() {
                 )
             }
             <StatsCard display icon={<FaBlog />} value={postsCount} text="Posts" />
-            <StatsCard display icon={<FaBell />} value={23} text="Notifications" />
+            <StatsCard display icon={<FaBell />} value={0} text="Notifications" />
         </div>
     )
 }

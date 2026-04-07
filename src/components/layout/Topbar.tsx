@@ -5,7 +5,7 @@ import UserButton from "@/components/ui/UserButton"
 import { CgClose } from "react-icons/cg"
 import { FiMenu } from "react-icons/fi"
 import NotificationButton from "../ui/NotificationButton"
-import SearchBar from "../ui/SearchBar"
+// import SearchBar from "../ui/SearchBar"
 import { SessionPayload } from "@/lib/sessions"
 
 type TopbarProp = {
@@ -27,7 +27,7 @@ export default function Topbar({ authUser }: TopbarProp) {
                         {isSideBarOpened ? <CgClose className="w-6 h-6" /> : <FiMenu className="w-6 h-6" />}
                     </button>
 
-                    <SearchBar />
+                    {/* <SearchBar /> */}
                 </div>
 
                 <div className="flex items-center space-x-4">

@@ -1,11 +1,12 @@
 "use client"
 
-import { mockNotifications } from "@/temp/notificationData"
+// import { mockNotifications } from "@/temp/notificationData"
 import { formatPostDate } from "@/utils/formatPostDate"
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 import { FaRegBell } from "react-icons/fa"
 import { LinkListItem } from "./ListItem"
+import { Notification } from "@/types/notification"
 
 export default function NotificationButton() {
 
@@ -15,7 +16,8 @@ export default function NotificationButton() {
     const [dropedMenu, setDropedMenu] = useState(false)
 
     const toggleDropMenu = () => {
-        setDropedMenu(prev => !prev)
+        // setDropedMenu(prev => !prev)
+        setDropedMenu(false)
     }
 
     const closeDropMenu = () => {
@@ -45,7 +47,8 @@ export default function NotificationButton() {
         }
     }, [dropedMenu])
 
-    const notifications = mockNotifications.filter(i => i.status === "unread")
+    // const notifications = mockNotifications.filter(i => i.status === "unread")
+    const notifications: Notification[] = []
 
     return (
         <div className=" relative">
