@@ -12,26 +12,39 @@ export const metadata: Metadata = {
         "Read articles, tutorials, and stories on writing, design, technology, and modern publishing.",
     openGraph: {
         title: "Blog | Bloggers Blog",
-        description:
-            "Insights, tutorials, and stories from writers on Bloggers Blog.",
+        description: "Insights, tutorials, and stories from writers on Bloggers Blog.",
         url: `${siteUrl}/blog`,
     },
-}
+};
 
-export default async function BlogPage() {
+type BlogPageProps = {
+    searchParams: Promise<{
+        search?: string;
+        category?: string;
+        sort?: string;
+        page?: string;
+    }>;
+};
+
+export default async function BlogPage({ searchParams }: BlogPageProps) {
+    const resolvedParams = await searchParams;
 
     return (
-        <div className=" flex-1">
-            <PageHeader title="Blog" subtitle="Insights, tutorials, and stories from writers building on Bloggers Blog." currentPage="Blog" />
-            <BlogPosts />
+        <div className="flex-1">
+            <PageHeader
+                title="Blog"
+                subtitle="Insights, tutorials, and stories from writers building on Bloggers Blog."
+                currentPage="Blog"
+            />
+            <BlogPosts searchParams={resolvedParams} />
             <CTA
                 text="Ready to start writing?"
                 subText="Join writers who value clarity, simplicity, and thoughtful publishing."
             >
-                <Link href={"/sign-up"}>
+                <Link href="/sign-up">
                     <Button text="Create an account" rounded />
                 </Link>
             </CTA>
         </div>
-    )
+    );
 }

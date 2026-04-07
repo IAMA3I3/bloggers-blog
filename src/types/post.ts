@@ -45,6 +45,6 @@ export type PostComment = {
     updatedAt: Date
 }
 
-export type SafePost = Omit<Post, "_id" | "userId"> & { id: string, userId: string }
+export type SafePost = Omit<Post, "_id" | "userId"> & { id: string, userId: string, authorName?: string }
 
 export type SafeComment = Omit<PostComment, "_id" | "userId"> & { id: string, userId: string }
