@@ -141,7 +141,7 @@ async function BlogDetailMain({ id }: { id: string }) {
             {/* Content */}
             <section className="container my-12 px-6 mx-auto">
                 <div
-                    className="prose prose-neutral dark:prose-invert max-w-none"
+                    className="prose prose-neutral prose-invert max-w-none"
                     dangerouslySetInnerHTML={{ __html: post.content }}
                 />
             </section>

@@ -1,6 +1,11 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @layer components {
+
+  /* ─── Base Prose ─────────────────────────────────────────────────────────── */
+
   .prose {
     color: theme('colors.gray.700');
     max-width: 65ch;
@@ -137,49 +142,55 @@
     margin-bottom: 3em;
   }
 
-  /* prose-neutral variant */
-  /* .prose-neutral { */
-    /* Already using gray/neutral colors above */
-  /* } */
+  /* ─── max-w-none ─────────────────────────────────────────────────────────── */
 
-  /* dark:prose-invert variant */
-  .dark .prose-invert {
+  .prose.max-w-none {
+    max-width: none;
+  }
+
+  /* ─── Dark Mode: prose-invert ────────────────────────────────────────────── */
+  /*
+    .dark is on <html> or <body>, while .prose and .prose-invert are on the
+    same child div. So the selector must be:
+      .dark .prose.prose-invert   — ancestor .dark, element has BOTH classes
+  */
+
+  .dark .prose.prose-invert {
     color: theme('colors.gray.300');
   }
 
-  .dark .prose-invert :where(h1, h2, h3, h4, strong):not(:where([class~="not-prose"] *)) {
+  .dark .prose.prose-invert :where(h1, h2, h3, h4):not(:where([class~="not-prose"] *)) {
     color: theme('colors.white');
   }
 
-  .dark .prose-invert :where(a):not(:where([class~="not-prose"] *)) {
+  .dark .prose.prose-invert :where(strong):not(:where([class~="not-prose"] *)) {
+    color: theme('colors.white');
+  }
+
+  .dark .prose.prose-invert :where(a):not(:where([class~="not-prose"] *)) {
     color: theme('colors.blue.400');
   }
 
-  .dark .prose-invert :where(a):hover:not(:where([class~="not-prose"] *)) {
+  .dark .prose.prose-invert :where(a):hover:not(:where([class~="not-prose"] *)) {
     color: theme('colors.blue.300');
   }
 
-  .dark .prose-invert :where(code):not(:where([class~="not-prose"] *)) {
+  .dark .prose.prose-invert :where(code):not(:where([class~="not-prose"] *)) {
     color: theme('colors.white');
     background-color: theme('colors.gray.800');
   }
 
-  .dark .prose-invert :where(blockquote):not(:where([class~="not-prose"] *)) {
+  .dark .prose.prose-invert :where(blockquote):not(:where([class~="not-prose"] *)) {
     color: theme('colors.gray.200');
     border-left-color: theme('colors.gray.700');
   }
 
-  .dark .prose-invert :where(hr):not(:where([class~="not-prose"] *)) {
+  .dark .prose.prose-invert :where(hr):not(:where([class~="not-prose"] *)) {
     border-color: theme('colors.gray.700');
-  }
-
-  /* max-w-none */
-  .prose.max-w-none {
-    max-width: none;
   }
 }
 
-@custom-variant dark (&:where(.dark, .dark *));
+/* ─── CSS Variables ──────────────────────────────────────────────────────────── */
 
 :root {
   --background: #e0e0e0;
@@ -208,7 +219,7 @@
   --muted: #b2b9c5;
   --border: #34445a;
 
-  /* hero orb colors — dark (more vivid) */
+  /* hero orb colors — dark */
   --orb-a-opacity: 0.55;
   --orb-b-opacity: 0.45;
   --orb-c-opacity: 0.22;
@@ -224,21 +235,21 @@
   --color-border: var(--border);
 }
 
+/* ─── Base ───────────────────────────────────────────────────────────────────── */
+
 body {
   background: var(--background);
   color: var(--foreground);
   transition: background-color 0.25s ease, color 0.25s ease;
 }
 
-
-/* ─── animations ─── */
+/* ─── Animations ─────────────────────────────────────────────────────────────── */
 
 @keyframes fadeIn {
   from {
     opacity: 0;
     transform: translateY(10px) scale(0.9);
   }
-
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -250,42 +261,22 @@ body {
 }
 
 @keyframes floatA {
-
-  0%,
-  100% {
-    transform: translate(0px, 0px) scale(1);
-  }
-
-  50% {
-    transform: translate(40px, 50px) scale(1.08);
-  }
+  0%, 100% { transform: translate(0px, 0px) scale(1); }
+  50%       { transform: translate(40px, 50px) scale(1.08); }
 }
 
 @keyframes floatB {
-
-  0%,
-  100% {
-    transform: translate(0px, 0px) scale(1);
-  }
-
-  50% {
-    transform: translate(-50px, -40px) scale(1.1);
-  }
+  0%, 100% { transform: translate(0px, 0px) scale(1); }
+  50%       { transform: translate(-50px, -40px) scale(1.1); }
 }
 
 @keyframes floatC {
-
-  0%,
-  100% {
-    transform: translate(-50%, -50%) scale(1);
-  }
-
-  50% {
-    transform: translate(calc(-50% + 30px), calc(-50% - 25px)) scale(1.05);
-  }
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50%       { transform: translate(calc(-50% + 30px), calc(-50% - 25px)) scale(1.05); }
 }
 
-/* hero background utilities */
+/* ─── Hero Background Utilities ──────────────────────────────────────────────── */
+
 .hero-orb-a {
   background: radial-gradient(circle, var(--orb-a) 0%, transparent 70%);
   opacity: var(--orb-a-opacity);
@@ -325,36 +316,26 @@ body {
   transition: opacity 0.4s ease;
 }
 
+/* ─── Marquee ────────────────────────────────────────────────────────────────── */
 
-/* marquee */
 @keyframes marquee {
-  from {
-    translate: 0;
-  }
-
-  to {
-    translate: -100%;
-  }
+  from { translate: 0; }
+  to   { translate: -100%; }
 }
 
 .animate-marquee {
   animation: marquee 20s infinite linear;
 }
 
-
 .marquee-container::-webkit-scrollbar {
   display: none;
 }
 
-/* shimer for skeleton loading */
-@keyframes shimmer {
-  0% {
-    transform: translateX(-100%);
-  }
+/* ─── Shimmer Skeleton ───────────────────────────────────────────────────────── */
 
-  100% {
-    transform: translateX(100%);
-  }
+@keyframes shimmer {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
 .animate-shimmer {

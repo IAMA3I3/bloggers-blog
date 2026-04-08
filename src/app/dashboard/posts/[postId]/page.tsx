@@ -97,7 +97,7 @@ async function PostDetailMain({ id, authUser }: { id: string, authUser: SessionP
             <section className=" container my-12 px-6 mx-auto">
                 <h2 className=" text-3xl font-semibold">{post.title}</h2>
                 <div
-                    className=" prose prose-neutral dark:prose-invert max-w-none"
+                    className="prose prose-neutral prose-invert max-w-none"
                     dangerouslySetInnerHTML={{ __html: post.content }}
                 />
             </section>
