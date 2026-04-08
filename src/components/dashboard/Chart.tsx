@@ -11,7 +11,6 @@ import {
     ResponsiveContainer,
     CartesianGrid,
 } from "recharts";
-// import { mockPosts } from "@/temp/postsData";
 import { SafePost } from "@/types/post";
 
 function getGroupingStrategy(posts: SafePost[]) {
@@ -64,7 +63,6 @@ function getSortKey(date: Date, strategy: "day" | "week" | "month"): number {
 
 export default function Chart({posts}: {posts: SafePost[]}) {
     const { isDarkTheme } = useStateContext();
-    // const posts = mockPosts;
 
     const strategy = getGroupingStrategy(posts);
 
