@@ -31,6 +31,8 @@ export function validateSignUp(data: SignUpFormData) {
 
     if (data.password.length < 8) {
         errors.password = "Password must be at least 8 characters"
+    } else if (Buffer.byteLength(data.password, "utf8") > 72) {
+        errors.password = "Password cannot be more than 72 characters"
     } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(data.password)) {
         errors.password = "Password must contain uppercase, lowercase, and number"
     }

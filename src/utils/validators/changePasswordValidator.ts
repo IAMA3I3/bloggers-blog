@@ -20,6 +20,8 @@ export function validateChangePassword(data: ChangePasswordFormData) {
         errors.newPassword = "New password is required"
     } else if (data.newPassword.length < 8) {
         errors.newPassword = "Password must be at least 8 characters"
+    } else if (Buffer.byteLength(data.newPassword, "utf8") > 72) {
+        errors.newPassword = "Password cannot be more than 72 characters"
     } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(data.newPassword)) {
         errors.newPassword = "Password must contain uppercase, lowercase, and number"
     }

@@ -20,6 +20,14 @@ import { ForgetPasswordError, validateForgetPassword } from "@/utils/validators/
 import { getResetPasswordEmailTemplate } from "@/lib/mail/templates/ResetPassword";
 import { ResetPasswordError, validateResetPassword } from "@/utils/validators/resetPasswordvalidator";
 import { DeleteAccountFormError, validateDeleteAccount } from "@/utils/validators/deleteAccountValidator";
+import { hashToken } from "@/utils/hashToken";
+
+// precomputed bcrypt hash with no matching password, used to keep sign-in
+// timing consistent whether or not the identifier matches a real account
+const DUMMY_PASSWORD_HASH = "$2b$10$Mm.9bNQ/tgGUCg/u.0dZeeoZVhsJjnQ1VHv3VZUUi50kbBqh5ovQW"
+
+const MAX_LOGIN_ATTEMPTS = 5
+const LOCK_DURATION_MS = 15 * 60 * 1000
 
 export async function signUpAction(data: SignUpFormData): ActionResponse<SignUpFormData, SignUpFormError> {
 
@@ -75,15 +83,14 @@ export async function signUpAction(data: SignUpFormData): ActionResponse<SignUpF
 
     // create verify mail cookie
     const cookieStore = await cookies()
-    cookieStore.set("verify-email", email, { maxAge: 600 })
+    cookieStore.set("verify-email", email, { maxAge: 600, httpOnly: true, secure: true, sameSite: "lax" })
 
     // prepare link to user's email:
     const verificationUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/verify-account?token=${verificationToken}`
     const { subject, html } = getVerifyEmailTemplate(username, verificationUrl)
 
-    // insert into the db
-    const result = await userCollection.insertOne({ username, email, password: hashedPassword, role: "user", status: "active", verified: false, verificationToken, verificationTokenExpires, createdAt: now, updatedAt: now } as User)
-    console.log(result)
+    // insert into the db (only the token hash is stored, never the raw token)
+    await userCollection.insertOne({ username, email, password: hashedPassword, role: "user", status: "active", verified: false, verificationToken: hashToken(verificationToken), verificationTokenExpires, createdAt: now, updatedAt: now } as User)
 
     // send link to user's email:
     await sendMail({ to: email, subject, html })
@@ -130,6 +137,9 @@ export async function signInAction(data: SignInFormData): ActionResponse<SignInF
         existingUser = await userCollection.findOne({ username: identifier })
     }
     if (!existingUser) {
+        // run a dummy compare so response timing doesn't reveal whether the
+        // identifier is registered
+        await bcrypt.compare(password, DUMMY_PASSWORD_HASH)
         return {
             success: false,
             data,
@@ -137,14 +147,45 @@ export async function signInAction(data: SignInFormData): ActionResponse<SignInF
         }
     }
 
-    // check password
-    const matchedPassword = await bcrypt.compare(password, existingUser.password)
-    if (!matchedPassword) {
+    // check lockout from prior failed attempts
+    if (existingUser.lockUntil && existingUser.lockUntil > new Date()) {
+        const minutesLeft = Math.ceil((existingUser.lockUntil.getTime() - Date.now()) / 60000)
         return {
             success: false,
             data,
-            errors: { default: "Invalid credential" }
+            errors: { default: `Too many failed attempts. Try again in ${minutesLeft} minute(s).` }
         }
+    }
+
+    // check password
+    const matchedPassword = await bcrypt.compare(password, existingUser.password)
+    if (!matchedPassword) {
+        const attempts = (existingUser.failedLoginAttempts ?? 0) + 1
+        const lockedOut = attempts >= MAX_LOGIN_ATTEMPTS
+
+        await userCollection.updateOne({ _id: existingUser._id }, {
+            $set: {
+                failedLoginAttempts: lockedOut ? 0 : attempts,
+                ...(lockedOut && { lockUntil: new Date(Date.now() + LOCK_DURATION_MS) })
+            }
+        })
+
+        return {
+            success: false,
+            data,
+            errors: {
+                default: lockedOut
+                    ? `Too many failed attempts. Try again in ${LOCK_DURATION_MS / 60000} minute(s).`
+                    : "Invalid credential"
+            }
+        }
+    }
+
+    // password correct: clear any prior failed-attempt tracking
+    if (existingUser.failedLoginAttempts || existingUser.lockUntil) {
+        await userCollection.updateOne({ _id: existingUser._id }, {
+            $unset: { failedLoginAttempts: "", lockUntil: "" }
+        })
     }
 
     // check if user is active
@@ -166,14 +207,14 @@ export async function signInAction(data: SignInFormData): ActionResponse<SignInF
         const { subject, html } = getVerifyEmailTemplate(existingUser.username, verificationUrl)
 
         await userCollection.updateOne({ email: existingUser.email }, {
-            $set: { verificationToken, verificationTokenExpires }
+            $set: { verificationToken: hashToken(verificationToken), verificationTokenExpires }
         })
 
         // send mail
         await sendMail({ to: existingUser.email, subject, html })
 
         const cookieStore = await cookies()
-        cookieStore.set("verify-email", existingUser.email, { maxAge: 600 })
+        cookieStore.set("verify-email", existingUser.email, { maxAge: 600, httpOnly: true, secure: true, sameSite: "lax" })
         cookieStore.set("resend-cooldown", "1", { maxAge: 60, httpOnly: true })
 
         redirect("/verify-account")
@@ -247,7 +288,7 @@ export async function resendVerificationLink(email: string): ActionResponseWitho
     const { subject, html } = getVerifyEmailTemplate(existingUser.username, verificationUrl)
 
     await userCollection.updateOne({ email }, {
-        $set: { verificationToken, verificationTokenExpires }
+        $set: { verificationToken: hashToken(verificationToken), verificationTokenExpires }
     })
 
     // send mail
@@ -412,14 +453,12 @@ export async function forgetPasswordAction(data: ForgetPasswordFormData): Action
         return { success: false, data, errors: { default: "Server error" } }
     }
 
-    // generic message to avoid user enumeration
     const existingUser = await userCollection.findOne({ email })
     if (!existingUser) {
-        return {
-            success: false,
-            data,
-            errors: { email: "Not valid" }
-        }
+        // respond exactly as the success path does so the response can't be
+        // used to check which emails are registered
+        cookieStore.set("resend-cooldown", "1", { maxAge: 60, httpOnly: true })
+        return { success: true, errors: {}, data }
     }
 
     const now = new Date()
@@ -448,7 +487,7 @@ export async function forgetPasswordAction(data: ForgetPasswordFormData): Action
 
     // update db before sending mail
     await userCollection.updateOne({ email }, {
-        $set: { resetPasswordToken, resetPasswordTokenExpires }
+        $set: { resetPasswordToken: hashToken(resetPasswordToken), resetPasswordTokenExpires }
     })
 
     await sendMail({ to: email, subject, html })
@@ -475,7 +514,7 @@ export async function resetPasswordAction(token: string, data: ResetPasswordForm
     if (!userCollection) return { success: false, data, errors: { default: "Service temporarily down" } }
 
     const user = await userCollection.findOne({
-        resetPasswordToken: token,
+        resetPasswordToken: hashToken(token),
         resetPasswordTokenExpires: { $gt: new Date() }
     })
     if (!user) return { success: false, data, errors: { default: "Invalid or expired token" } }

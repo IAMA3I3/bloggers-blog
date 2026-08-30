@@ -54,6 +54,8 @@ export type User = {
     verificationTokenExpires?: Date,
     resetPasswordToken?: string,
     resetPasswordTokenExpires?: Date,
+    failedLoginAttempts?: number
+    lockUntil?: Date
     createdAt: Date
     updatedAt?: Date
 }

@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server"
 import getAuthUser from "./lib/auth/getAuthUser"
 
+// getAuthUser hits MongoDB to revalidate role/status, which needs Node.js
+// APIs unavailable on the default Edge middleware runtime
+export const runtime = "nodejs"
+
 const protectedRoutes = ["/dashboard"]
 const publicRoutes = ["/sign-up", "/sign-in", "/forget-password", "/reset-password"]
 const adminRoutes = ["/dashboard/users"]

@@ -15,11 +15,14 @@ const initialData: SignInFormData = {
     password: ""
 }
 
+const FAILED_ATTEMPTS_HINT_THRESHOLD = 2
+
 export default function () {
     const router = useRouter()
     const [data, setData] = useState<SignInFormData>(initialData)
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState<SignInFormError>({})
+    const [failedAttempts, setFailedAttempts] = useState(0)
 
     const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target
@@ -41,12 +44,14 @@ export default function () {
         const result = await signInAction(data)
         if (!result.success) {
             setError(result.errors)
+            setFailedAttempts((prev) => prev + 1)
             setIsLoading(false)
             return
         }
 
         setData(initialData)
         setError({})
+        setFailedAttempts(0)
         setIsLoading(false)
         toast.success("Welcome back")
         router.replace("/dashboard")
@@ -79,6 +84,11 @@ export default function () {
                     backgroundColor=" bg-white dark:bg-slate-900"
                     error={error.password || undefined}
                 />
+                {failedAttempts >= FAILED_ATTEMPTS_HINT_THRESHOLD && (
+                    <p className=" text-sm text-amber-500 text-center">
+                        Trouble signing in? Repeated failed attempts will temporarily lock this account — resetting your password may be quicker.
+                    </p>
+                )}
                 <Link href={"/forget-password"} className=" inline-block text-sm font-semibold text-muted underline hover:text-primary">Forget Password</Link>
                 <div className=" flex justify-center">
                     <Button isLoading={isLoading} type="submit" text="LOGIN" size="large" rounded />

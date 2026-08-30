@@ -1,6 +1,7 @@
 import { User } from "@/types/auth"
 import { getCollection } from "../db"
 import { createSession } from "../sessions"
+import { hashToken } from "@/utils/hashToken"
 
 export async function verifyAccount(token: string) {
     if (!token) return false
@@ -11,7 +12,7 @@ export async function verifyAccount(token: string) {
 
     // find user with matching token that hasn't expired
     const user = await userCollection.findOne({
-        verificationToken: token,
+        verificationToken: hashToken(token),
         verificationTokenExpires: { $gt: new Date() }
     })
 
