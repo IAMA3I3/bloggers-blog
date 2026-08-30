@@ -9,9 +9,10 @@ type BlogPostsClientProps = {
     posts: SafePost[];
     totalPages: number;
     currentPage: number;
+    currentUserId?: string;
 };
 
-export default function BlogPostsClient({ posts, totalPages, currentPage }: BlogPostsClientProps) {
+export default function BlogPostsClient({ posts, totalPages, currentPage, currentUserId }: BlogPostsClientProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
 
@@ -47,10 +48,13 @@ export default function BlogPostsClient({ posts, totalPages, currentPage }: Blog
                         category={post.category}
                         media={post.media}
                         id={post.id}
+                        slug={post.slug}
                         title={post.title}
                         content={post.content}
                         authorName={post.authorName || ""}
                         createdAt={post.createdAt}
+                        likes={post.likes}
+                        currentUserId={currentUserId}
                     />
                 ))}
             </div>

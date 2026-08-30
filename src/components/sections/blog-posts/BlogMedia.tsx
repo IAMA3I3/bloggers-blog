@@ -1,4 +1,5 @@
 import { Post } from "@/types/post"
+import { cldUrl } from "@/utils/cloudinaryUrl"
 
 type BlogMediaProps = {
     media: Post['media']
@@ -41,7 +42,7 @@ export default function BlogMedia({ media }: BlogMediaProps) {
             {imageMedia.length === 1 && (
                 <div className="w-full aspect-video rounded-2xl overflow-hidden border border-border shadow-2xl">
                     <img
-                        src={imageMedia[0].url}
+                        src={cldUrl(imageMedia[0].url, "f_auto,q_auto,w_1600")}
                         alt={imageMedia[0].filename || "Blog post image"}
                         className="w-full h-full object-cover"
                         loading="eager"
@@ -57,7 +58,7 @@ export default function BlogMedia({ media }: BlogMediaProps) {
                             className="w-full aspect-4/3 rounded-xl overflow-hidden border border-border shadow-lg"
                         >
                             <img
-                                src={item.url}
+                                src={cldUrl(item.url, "f_auto,q_auto,w_900")}
                                 alt={item.filename || `Blog image ${index + 1}`}
                                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                                 loading={index === 0 ? "eager" : "lazy"}
@@ -72,7 +73,7 @@ export default function BlogMedia({ media }: BlogMediaProps) {
                     {/* First image spans 2 columns */}
                     <div className="col-span-2 w-full aspect-video rounded-xl overflow-hidden border border-border shadow-lg">
                         <img
-                            src={imageMedia[0].url}
+                            src={cldUrl(imageMedia[0].url, "f_auto,q_auto,w_1200")}
                             alt={imageMedia[0].filename || "Featured blog image"}
                             className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                             loading="eager"
@@ -86,7 +87,7 @@ export default function BlogMedia({ media }: BlogMediaProps) {
                             className="w-full aspect-square rounded-xl overflow-hidden border border-border shadow-lg"
                         >
                             <img
-                                src={item.url}
+                                src={cldUrl(item.url, "f_auto,q_auto,w_600")}
                                 alt={item.filename || `Blog image ${index + 2}`}
                                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                                 loading="lazy"

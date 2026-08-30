@@ -13,6 +13,7 @@ import { deleteUserAction } from "@/actions/auth";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { deletePostAction } from "@/actions/post";
+import { cldUrl } from "@/utils/cloudinaryUrl";
 
 type LinkListItemProps = {
     href: string
@@ -133,7 +134,7 @@ export const ActionListItem = ({ media, mutedText, mainText, contentText, href, 
                         <div className=" w-full md:w-25 h-25 overflow-hidden">
                             {
                                 media.type === "image" ? (
-                                    <img src={media.url} alt={media.filename} className=" w-full h-full object-cover group-hover:scale-110 transition-all duration-500" />
+                                    <img src={cldUrl(media.url, "f_auto,q_auto,w_200")} alt={media.filename} className=" w-full h-full object-cover group-hover:scale-110 transition-all duration-500" />
                                 ) : (
                                     <video src={media.url} autoPlay loop muted className=" w-full h-full object-cover group-hover:scale-110 transition-all duration-500" />
                                 )

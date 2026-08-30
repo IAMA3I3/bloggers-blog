@@ -4,11 +4,14 @@ import { useEditor, EditorContent, Extension } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
 import Link from '@tiptap/extension-link';
+import ImageExtension from '@tiptap/extension-image';
 import TextAlign from '@tiptap/extension-text-align';
 import { TextStyle } from '@tiptap/extension-text-style';
 import Color from '@tiptap/extension-color';
 import Placeholder from '@tiptap/extension-placeholder';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { uploadFileToCloudinary } from '@/lib/media/uploadToCloudinaryClient';
+import toast from 'react-hot-toast';
 
 // ─── Custom Font Size Extension ───────────────────────────────────────────────
 const FontSize = Extension.create({
@@ -57,6 +60,8 @@ const ListIcon = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="non
 const OrderedListIcon = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="10" y1="6" x2="21" y2="6" /><line x1="10" y1="12" x2="21" y2="12" /><line x1="10" y1="18" x2="21" y2="18" /><path d="M4 6h1v4" /><path d="M4 10h2" /><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1" /></svg>;
 const QuoteIcon = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 2v3.75c0 1.25.75 2.25 2 2.5.56.1 1 .606 1 1.25v1.5c0 .982-.5 1.5-2 2H3z" /><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 2v3.75c0 1.25.75 2.25 2 2.5.56.1 1 .606 1 1.25v1.5c0 .982-.5 1.5-2 2h-1z" /></svg>;
 const CodeIcon = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" /></svg>;
+const ImageIcon = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>;
+const SpinnerIcon = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" className="animate-spin"><circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="3" opacity="0.25" /><path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" strokeWidth="3" strokeLinecap="round" /></svg>;
 const AlignLeftIcon = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="21" y1="6" x2="3" y2="6" /><line x1="15" y1="12" x2="3" y2="12" /><line x1="17" y1="18" x2="3" y2="18" /></svg>;
 const AlignCenterIcon = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="21" y1="6" x2="3" y2="6" /><line x1="17" y1="12" x2="7" y2="12" /><line x1="19" y1="18" x2="5" y2="18" /></svg>;
 const AlignRightIcon = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="21" y1="6" x2="3" y2="6" /><line x1="21" y1="12" x2="9" y2="12" /><line x1="21" y1="18" x2="7" y2="18" /></svg>;
@@ -191,6 +196,8 @@ export default function RichTextEditor({
     const [charCount, setCharCount] = useState(0);
     // Track active color independently so it persists while typing
     const [activeColor, setActiveColor] = useState<string | null>(null);
+    const [isUploadingImage, setIsUploadingImage] = useState(false);
+    const imageInputRef = useRef<HTMLInputElement>(null);
 
     const editor = useEditor({
         immediatelyRender: false,
@@ -210,6 +217,9 @@ export default function RichTextEditor({
             Link.configure({
                 openOnClick: false,
                 HTMLAttributes: { class: 'text-blue-500 underline hover:text-blue-400 cursor-pointer' },
+            }),
+            ImageExtension.configure({
+                HTMLAttributes: { class: 'rounded-lg' },
             }),
             Placeholder.configure({ placeholder }),
         ],
@@ -247,6 +257,22 @@ export default function RichTextEditor({
         setLinkUrl('');
         setShowLinkInput(false);
     }, [editor, linkUrl]);
+
+    const handleImageFile = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (imageInputRef.current) imageInputRef.current.value = '';
+        if (!file) return;
+
+        setIsUploadingImage(true);
+        try {
+            const uploaded = await uploadFileToCloudinary(file);
+            editor?.chain().focus().setImage({ src: uploaded.url, alt: file.name }).run();
+        } catch {
+            toast.error('Image upload failed');
+        } finally {
+            setIsUploadingImage(false);
+        }
+    }, [editor]);
 
     if (!editor) return null;
 
@@ -405,6 +431,22 @@ export default function RichTextEditor({
                     >
                         <LinkIcon />
                     </ToolbarButton>
+
+                    {/* Image */}
+                    <ToolbarButton
+                        onClick={() => imageInputRef.current?.click()}
+                        disabled={isUploadingImage}
+                        title="Insert image"
+                    >
+                        {isUploadingImage ? <SpinnerIcon /> : <ImageIcon />}
+                    </ToolbarButton>
+                    <input
+                        ref={imageInputRef}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleImageFile}
+                    />
 
                     <Divider />
 
