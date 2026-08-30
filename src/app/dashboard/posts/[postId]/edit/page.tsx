@@ -47,7 +47,8 @@ async function RenderPostsEdit({ id, authUser }: { id: string, authUser: Session
         notFound()
     }
 
-    if (authUser.role !== "admin" && post.userId !== authUser.userId) notFound()
+    // Only the author can edit — admin moderation is limited to suspend/restore/delete
+    if (post.userId !== authUser.userId) notFound()
 
     const initialFormData: PostFormData = {
         title: post.title,

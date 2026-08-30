@@ -6,6 +6,7 @@ export const metadata: Metadata = {
     title: "Terms & Conditions",
     description:
         "Read the terms and conditions governing the use of Bloggers Blog.",
+    alternates: { canonical: `${siteUrl}/terms` },
     openGraph: {
         title: "Terms & Conditions | Bloggers Blog",
         description:
@@ -66,7 +67,45 @@ export default function TermsPage() {
 
                 <section>
                     <h2 className="text-xl font-semibold text-black dark:text-white">
-                        5. Intellectual Property
+                        5. Content Moderation &amp; Enforcement
+                    </h2>
+                    <p className="mt-3">
+                        We reserve the right, but not the obligation, to review any content
+                        published on the platform. If content is found to violate these
+                        Terms, or is otherwise inappropriate, unlawful, or harmful in our
+                        sole discretion, we may suspend it — removing it from public view
+                        while leaving it in place, rather than deleting it outright — so
+                        that you may revise it for review. A suspension may be lifted once
+                        the issue has been resolved. For repeated or serious violations, we
+                        may also suspend or terminate the associated account. Suspending
+                        content or an account does not waive any other rights or remedies
+                        available to us.
+                    </p>
+                </section>
+
+                <section>
+                    <h2 className="text-xl font-semibold text-black dark:text-white">
+                        6. Privacy &amp; Data
+                    </h2>
+                    <p className="mt-3">
+                        We collect the information you provide when creating an account,
+                        such as your username, email address, and password, along with the
+                        content you choose to publish. Passwords are stored using
+                        industry-standard hashing and are never stored in plain text. We use
+                        cookies to keep you signed in and to support core platform
+                        functionality such as email verification. We do not sell your
+                        personal information. We may rely on trusted third-party service
+                        providers, such as cloud hosting, database, and media storage
+                        providers, to operate the platform; these providers process your
+                        data only as needed to provide their services to us. By using the
+                        platform, you consent to the collection and use of information as
+                        described here.
+                    </p>
+                </section>
+
+                <section>
+                    <h2 className="text-xl font-semibold text-black dark:text-white">
+                        7. Intellectual Property
                     </h2>
                     <p className="mt-3">
                         All platform branding, design, and functionality are the property
@@ -77,7 +116,22 @@ export default function TermsPage() {
 
                 <section>
                     <h2 className="text-xl font-semibold text-black dark:text-white">
-                        6. Disclaimer
+                        8. Copyright Complaints
+                    </h2>
+                    <p className="mt-3">
+                        If you believe content published on Bloggers Blog infringes your
+                        copyright, please contact us via the Contact page with a description
+                        of the copyrighted work, the location of the allegedly infringing
+                        content, and your contact information. We will review valid claims
+                        and remove or disable access to infringing content as appropriate.
+                        Accounts found to be repeat infringers may be suspended or
+                        terminated.
+                    </p>
+                </section>
+
+                <section>
+                    <h2 className="text-xl font-semibold text-black dark:text-white">
+                        9. Disclaimer
                     </h2>
                     <p className="mt-3">
                         Bloggers Blog is provided “as is” without warranties of any kind. We
@@ -88,7 +142,7 @@ export default function TermsPage() {
 
                 <section>
                     <h2 className="text-xl font-semibold text-black dark:text-white">
-                        7. Limitation of Liability
+                        10. Limitation of Liability
                     </h2>
                     <p className="mt-3">
                         Bloggers Blog shall not be liable for any damages resulting from
@@ -98,7 +152,7 @@ export default function TermsPage() {
 
                 <section>
                     <h2 className="text-xl font-semibold text-black dark:text-white">
-                        8. Changes to These Terms
+                        11. Changes to These Terms
                     </h2>
                     <p className="mt-3">
                         We may update these Terms from time to time. Continued use of the
@@ -108,7 +162,7 @@ export default function TermsPage() {
 
                 <section>
                     <h2 className="text-xl font-semibold text-black dark:text-white">
-                        9. Contact
+                        12. Contact
                     </h2>
                     <p className="mt-3">
                         If you have any questions about these Terms, please contact us via

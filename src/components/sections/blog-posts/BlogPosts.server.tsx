@@ -6,7 +6,9 @@ import { Post, PostCategory, SafePost } from "@/types/post";
 import { User } from "@/types/auth"; // adjust to your User type
 import { ObjectId, Filter } from "mongodb";
 import { stripHtml } from "@/utils/stripHTML";
+import { escapeRegExp } from "@/utils/escapeRegExp";
 import { periods } from "@/utils/appStore";
+import getAuthUser from "@/lib/auth/getAuthUser";
 
 const POSTS_PER_PAGE = 6;
 
@@ -44,9 +46,10 @@ async function BlogFetch({ searchParams }: BlogPostsProps) {
     };
 
     if (search?.trim()) {
+        const searchTerm = escapeRegExp(search.trim());
         filter.$or = [
-            { title: { $regex: search.trim(), $options: "i" } },
-            { content: { $regex: search.trim(), $options: "i" } },
+            { title: { $regex: searchTerm, $options: "i" } },
+            { content: { $regex: searchTerm, $options: "i" } },
         ];
     }
 
@@ -61,6 +64,7 @@ async function BlogFetch({ searchParams }: BlogPostsProps) {
 
     try {
         const postsCollection = await getCollection<Post>("posts");
+        const authUser = await getAuthUser();
 
         const [rawPosts, totalCount] = await Promise.all([
             postsCollection.find(filter).sort(sortOrder).skip(skip).limit(POSTS_PER_PAGE).toArray(),
@@ -93,6 +97,7 @@ async function BlogFetch({ searchParams }: BlogPostsProps) {
                 posts={posts}
                 totalPages={totalPages}
                 currentPage={currentPage}
+                currentUserId={authUser?.userId}
             />
         );
     } catch {

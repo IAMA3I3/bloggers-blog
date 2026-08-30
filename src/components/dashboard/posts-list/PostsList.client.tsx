@@ -11,11 +11,12 @@ import { useEffect } from "react"
 
 type PostsListClientProps = {
     posts: SafePost[]
+    currentUserId: string
 }
 
 const POSTS_PER_PAGE = 10
 
-export default function PostsListClient({ posts }: PostsListClientProps) {
+export default function PostsListClient({ posts, currentUserId }: PostsListClientProps) {
 
     const router = useRouter()
     const searchParams = useSearchParams()
@@ -57,8 +58,8 @@ export default function PostsListClient({ posts }: PostsListClientProps) {
                         mainText={post.title}
                         contentText={stripHtml(post.content)}
                         href={`/dashboard/posts/${post.id}`}
-                        actionButton={{ action: "EDIT", href: `/dashboard/posts/${post.id}/edit` }}
-                        deleteAction={{ for: "POSTS", id: post.id }}
+                        actionButton={post.userId === currentUserId ? { action: "EDIT", href: `/dashboard/posts/${post.id}/edit` } : undefined}
+                        deleteAction={post.userId === currentUserId ? { for: "POSTS", id: post.id } : undefined}
                         status={{
                             variant: post.status === "published" ? "success" : post.status === "draft" ? "info" : "secondary",
                             text: post.status === "published" ? "Published" : post.status === "draft" ? "Draft" : "Suspended"

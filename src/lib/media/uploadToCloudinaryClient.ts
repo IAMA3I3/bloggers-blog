@@ -4,7 +4,7 @@ import { PostMedia } from "@/types/post"
 
 export async function uploadFileToCloudinary(file: File): Promise<PostMedia> {
     const isVideo = file.type.startsWith("video/")
-    const { signature, timestamp, cloudName, apiKey, resourceType } =
+    const { signature, timestamp, cloudName, apiKey, resourceType, allowedFormats } =
         await getCloudinarySignature(isVideo)
 
     const formData = new FormData()
@@ -13,6 +13,7 @@ export async function uploadFileToCloudinary(file: File): Promise<PostMedia> {
     formData.append("timestamp", String(timestamp))
     formData.append("signature", signature)
     formData.append("folder", "posts")
+    formData.append("allowed_formats", allowedFormats)
 
     const res = await fetch(
         `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`,

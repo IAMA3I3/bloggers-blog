@@ -16,7 +16,8 @@ export async function getCloudinarySignature(isVideo: boolean) {
     if (!authUser) redirect("/sign-in")
 
     const timestamp = Math.round(new Date().getTime() / 1000)
-    const params = { timestamp, folder: "posts" }
+    const allowedFormats = isVideo ? "mp4,webm,mov" : "jpg,jpeg,png,webp,gif"
+    const params = { timestamp, folder: "posts", allowed_formats: allowedFormats }
 
     const signature = cloudinary.utils.api_sign_request(params, process.env.CLOUDINARY_API_SECRET!)
 
@@ -26,5 +27,6 @@ export async function getCloudinarySignature(isVideo: boolean) {
         cloudName: process.env.CLOUDINARY_CLOUD_NAME!,
         apiKey: process.env.CLOUDINARY_API_KEY!,
         resourceType: isVideo ? "video" : "image",
+        allowedFormats,
     }
 }

@@ -32,5 +32,5 @@ export default async function PostsList({ status }: PostsListProps) {
         throw new Error("Failed to load posts")
     }
 
-    return <PostsListClient posts={posts} />
+    return <PostsListClient posts={posts} currentUserId={authUser.userId} />
 }
