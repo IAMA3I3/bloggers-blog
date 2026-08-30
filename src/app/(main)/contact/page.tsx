@@ -10,6 +10,7 @@ export const metadata: Metadata = {
     title: "Contact",
     description:
         "Get in touch with the Bloggers Blog team for questions, feedback, or collaboration opportunities.",
+    alternates: { canonical: `${siteUrl}/contact` },
     openGraph: {
         title: "Contact | Bloggers Blog",
         description:

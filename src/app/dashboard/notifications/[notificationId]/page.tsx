@@ -1,8 +1,11 @@
 import { PageCard } from "@/components/containers/Cards"
-import { mockNotifications } from "@/temp/notificationData"
+import { Button } from "@/components/ui/Button"
+import { getNotificationById, markNotificationReadAction } from "@/actions/notification"
 import { formatPostDate } from "@/utils/formatPostDate"
 import Link from "next/link"
+import { notFound } from "next/navigation"
 import { Suspense } from "react"
+import { FaArrowRight } from "react-icons/fa6"
 
 type NotificationDetailProps = {
     params: Promise<{
@@ -27,13 +30,24 @@ export default async function NotificationDetail({ params }: NotificationDetailP
 }
 
 async function NotificationDetailMain({ id }: { id: string }) {
-    await new Promise(res => setTimeout(res, 2000))
-    const notification = mockNotifications[0]
+    const notification = await getNotificationById(id)
+    if (!notification) notFound()
+
+    if (notification.status === "unread") {
+        await markNotificationReadAction(id)
+    }
 
     return (
         <PageCard centerAlign>
             <p className=" text-muted text-sm font-semibold mb-4">{formatPostDate(notification.createdAt)}</p>
             <p>{notification.content}</p>
+            {
+                notification.link && (
+                    <Link href={notification.link} className=" mt-6 inline-block">
+                        <Button text="View" icon={FaArrowRight} iconPosition="end" />
+                    </Link>
+                )
+            }
         </PageCard>
     )
 }

@@ -1,15 +1,20 @@
 "use client"
 
-import Link from "next/link"
-import { ChangeEvent, useEffect, useState } from "react"
+import { ChangeEvent, useEffect, useRef, useState } from "react"
 import { IoSearch } from "react-icons/io5"
 import { LinkListItem } from "./ListItem"
+import { searchDashboard, DashboardSearchResult } from "@/actions/search"
+
+const emptyResults: DashboardSearchResult = { users: [], posts: [], notifications: [] }
 
 export default function SearchBar() {
 
     const [searchValue, setSearchValue] = useState("")
     const [debouncedValue, setDebouncedValue] = useState("")
     const [dropedMenu, setDropedMenu] = useState(false)
+    const [results, setResults] = useState<DashboardSearchResult>(emptyResults)
+    const [isLoading, setIsLoading] = useState(false)
+    const requestId = useRef(0)
 
     const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         setSearchValue(e.target.value)
@@ -30,14 +35,26 @@ export default function SearchBar() {
     }, [searchValue])
 
     useEffect(() => {
-        if (debouncedValue.trim() !== "") {
-            setDropedMenu(true)
-
-            console.log("Searching for:", debouncedValue)
-        } else {
+        if (debouncedValue.trim() === "") {
+            setResults(emptyResults)
             setDropedMenu(false)
+            return
         }
+
+        setDropedMenu(true)
+        setIsLoading(true)
+
+        const thisRequest = ++requestId.current
+        searchDashboard(debouncedValue).then((data) => {
+            // ignore stale responses if a newer search has since started
+            if (thisRequest === requestId.current) {
+                setResults(data)
+                setIsLoading(false)
+            }
+        })
     }, [debouncedValue])
+
+    const hasResults = results.users.length > 0 || results.posts.length > 0 || results.notifications.length > 0
 
     return (
         <div className=" relative">
@@ -61,48 +78,52 @@ export default function SearchBar() {
                 `}
             >
                 <div className=" max-h-100 overflow-y-auto">
-                    {/* <p className=" text-muted text-sm">No result found</p> */}
-                    <div className=" space-y-4">
-                        {/* users */}
-                        <div className=" space-y-2">
-                            <p className=" text-xs font-semibold text-primary">Users</p>
-                            {
-                                ["Username", "Somebody"].map(user => (
-                                    <LinkListItem
-                                        key={user}
-                                        href={`/dashboard/users/${user}`}
-                                        text={user}
-                                    />
-                                ))
-                            }
-                        </div>
-                        {/* posts */}
-                        <div className=" space-y-2">
-                            <p className=" text-xs font-semibold text-primary">Posts</p>
-                            {
-                                ["Post 1", "Post 2"].map(post => (
-                                    <LinkListItem
-                                        key={post}
-                                        href={`/dashboard/posts/${post}`}
-                                        text={post}
-                                    />
-                                ))
-                            }
-                        </div>
-                        {/* notifications */}
-                        <div className=" space-y-2">
-                            <p className=" text-xs font-semibold text-primary">Notifications</p>
-                            {
-                                ["Notification 1", "Notification 2"].map(notification => (
-                                    <LinkListItem
-                                        key={notification}
-                                        href={`/dashboard/notifications/${notification}`}
-                                        text={notification}
-                                    />
-                                ))
-                            }
-                        </div>
-                    </div>
+                    {
+                        isLoading ? (
+                            <p className=" text-muted text-sm p-2">Searching...</p>
+                        ) : !hasResults ? (
+                            <p className=" text-muted text-sm p-2">No result found</p>
+                        ) : (
+                            <div className=" space-y-4">
+                                {results.users.length > 0 && (
+                                    <div className=" space-y-2">
+                                        <p className=" text-xs font-semibold text-primary">Users</p>
+                                        {results.users.map((user) => (
+                                            <LinkListItem
+                                                key={user.id}
+                                                href={`/dashboard/users/${user.id}`}
+                                                text={user.label}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
+                                {results.posts.length > 0 && (
+                                    <div className=" space-y-2">
+                                        <p className=" text-xs font-semibold text-primary">Posts</p>
+                                        {results.posts.map((post) => (
+                                            <LinkListItem
+                                                key={post.id}
+                                                href={`/dashboard/posts/${post.id}`}
+                                                text={post.label}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
+                                {results.notifications.length > 0 && (
+                                    <div className=" space-y-2">
+                                        <p className=" text-xs font-semibold text-primary">Notifications</p>
+                                        {results.notifications.map((notification) => (
+                                            <LinkListItem
+                                                key={notification.id}
+                                                href={`/dashboard/notifications/${notification.id}`}
+                                                text={notification.label}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        )
+                    }
                 </div>
             </div>
         </div>

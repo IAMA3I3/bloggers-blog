@@ -10,6 +10,7 @@ export const metadata: Metadata = {
     title: "Blog",
     description:
         "Read articles, tutorials, and stories on writing, design, technology, and modern publishing.",
+    alternates: { canonical: `${siteUrl}/blog` },
     openGraph: {
         title: "Blog | Bloggers Blog",
         description: "Insights, tutorials, and stories from writers on Bloggers Blog.",

@@ -6,6 +6,12 @@ import HowItWorks from "@/components/sections/HowItWorks";
 import TechStackStrip from "@/components/sections/TechStackStrip";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
+import { siteUrl } from "@/utils/appStore";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+    alternates: { canonical: siteUrl },
+}
 
 export default async function Home() {
 

@@ -7,6 +7,7 @@ import { getCollection } from "@/lib/db"
 import { ObjectId, WithId } from "mongodb"
 import { stripHtml } from "@/utils/stripHTML"
 import { User } from "@/types/auth"
+import getAuthUser from "@/lib/auth/getAuthUser"
 
 type RelatedPostsProps = {
     id: string
@@ -35,6 +36,7 @@ const serializePosts = (posts: WithId<Post>[], usersMap: Record<string, string>)
 async function FetchedRelatedPosts({ id, category }: { id: string; category: PostCategory }) {
 
     let relatedPosts: SafePost[] = []
+    const authUser = await getAuthUser()
 
     try {
         const postsCollection = await getCollection<Post>("posts")
@@ -64,10 +66,13 @@ async function FetchedRelatedPosts({ id, category }: { id: string; category: Pos
                                     category={post.category}
                                     media={post.media}
                                     id={post.id}
+                                    slug={post.slug}
                                     title={post.title}
                                     content={stripHtml(post.content)}
                                     authorName={post.authorName || ""}
                                     createdAt={post.createdAt}
+                                    likes={post.likes}
+                                    currentUserId={authUser?.userId}
                                 />
                             ))
                         }

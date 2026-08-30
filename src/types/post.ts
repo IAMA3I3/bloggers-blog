@@ -26,12 +26,14 @@ export type PostFormData = {
 export type Post = {
     _id: ObjectId
     title: string
+    slug: string
     content: string
     userId: ObjectId
     category: PostCategory
     featured: boolean
     media: PostMedia[] // Array of media files
     status: PostStatus
+    likes: string[] // userId strings of who liked this post
     createdAt: Date
     updatedAt: Date
 }
@@ -47,4 +49,4 @@ export type PostComment = {
 
 export type SafePost = Omit<Post, "_id" | "userId"> & { id: string, userId: string, authorName?: string }
 
-export type SafeComment = Omit<PostComment, "_id" | "userId"> & { id: string, userId: string }
+export type SafeComment = Omit<PostComment, "_id" | "userId"> & { id: string, userId: string, authorName?: string }

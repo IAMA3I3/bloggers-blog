@@ -4,35 +4,33 @@ import { formatPostDate } from "@/utils/formatPostDate"
 import { dashedToCapitalized } from "@/utils/textFormat"
 import { Suspense } from "react"
 import BlogMedia from "@/components/sections/blog-posts/BlogMedia"
-import { HeartTick } from "@/components/ui/Ticks"
-import { BiCommentDetail } from "react-icons/bi"
 import CommentForm from "@/components/forms/CommentForm"
 import BlogComments from "@/components/sections/blog-details/BlogComments"
-import { LoadingSpinner } from "@/components/ui/Loading"
 import RelatedPosts from "@/components/sections/blog-details/RelatedPosts"
+import LikeButton from "@/components/posts/LikeButton"
+import PostContent from "@/components/posts/PostContent"
 import type { Metadata } from "next"
 import { getCollection } from "@/lib/db"
-import { User } from "@/types/auth" // adjust to your User type
-import { ObjectId } from "mongodb"
+import { getCommentsForPost } from "@/actions/comment"
+import { User } from "@/types/auth"
+import getAuthUser from "@/lib/auth/getAuthUser"
 import { notFound } from "next/navigation"
 import { siteUrl } from "@/utils/appStore"
 import { stripHtml } from "@/utils/stripHTML"
+import { BiCommentDetail } from "react-icons/bi"
 
 type BlogDetailProps = {
-    params: Promise<{ blogId: string }>
+    params: Promise<{ slug: string }>
 }
 
 // ─── Metadata ────────────────────────────────────────────────────────────────
 
 export async function generateMetadata({ params }: BlogDetailProps): Promise<Metadata> {
-    const { blogId } = await params
+    const { slug } = await params
 
     try {
         const postsCollection = await getCollection<Post>("posts")
-        const post = await postsCollection.findOne({
-            _id: new ObjectId(blogId),
-            status: "published",
-        })
+        const post = await postsCollection.findOne({ slug, status: "published" })
 
         if (!post) {
             return {
@@ -43,14 +41,16 @@ export async function generateMetadata({ params }: BlogDetailProps): Promise<Met
 
         const plainContent = stripHtml(post.content).slice(0, 160)
         const coverImage = post.media?.[0]?.url
+        const url = `${siteUrl}/blog/${slug}`
 
         return {
             title: post.title,
             description: plainContent,
+            alternates: { canonical: url },
             openGraph: {
                 title: `${post.title} | Bloggers Blog`,
                 description: plainContent,
-                url: `${siteUrl}/blog/${blogId}`,
+                url,
                 type: "article",
                 publishedTime: post.createdAt.toISOString(),
                 modifiedTime: post.updatedAt.toISOString(),
@@ -76,12 +76,12 @@ export async function generateMetadata({ params }: BlogDetailProps): Promise<Met
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function BlogDetails({ params }: BlogDetailProps) {
-    const { blogId } = await params
+    const { slug } = await params
 
     return (
         <article className="flex-1">
             <Suspense fallback={<SkeletonLoading />}>
-                <BlogDetailMain id={blogId} />
+                <BlogDetailMain slug={slug} />
             </Suspense>
         </article>
     )
@@ -89,13 +89,13 @@ export default async function BlogDetails({ params }: BlogDetailProps) {
 
 // ─── Main Content ─────────────────────────────────────────────────────────────
 
-async function BlogDetailMain({ id }: { id: string }) {
+async function BlogDetailMain({ slug }: { slug: string }) {
     let post: SafePost
 
     try {
         const postsCollection = await getCollection<Post>("posts")
         const rawPost = await postsCollection.findOne({
-            _id: new ObjectId(id),
+            slug,
             status: "published",
         })
 
@@ -103,21 +103,44 @@ async function BlogDetailMain({ id }: { id: string }) {
 
         // Fetch author
         const usersCollection = await getCollection<User>("users")
-        const author = await usersCollection.findOne({ _id: new ObjectId(rawPost.userId) })
+        const author = await usersCollection.findOne({ _id: rawPost.userId })
 
         const { _id, userId, ...rest } = rawPost
         post = {
             ...rest,
             id: _id.toString(),
             userId: userId.toString(),
-            authorName: author?.username ?? "Unknown", // adjust to your field
+            authorName: author?.username ?? "Unknown",
         }
     } catch {
         return notFound()
     }
 
+    const [authUser, comments] = await Promise.all([
+        getAuthUser(),
+        getCommentsForPost(post.id),
+    ])
+
+    const url = `${siteUrl}/blog/${slug}`
+    const jsonLd = {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        headline: post.title,
+        datePublished: post.createdAt.toISOString(),
+        dateModified: post.updatedAt.toISOString(),
+        author: { "@type": "Person", name: post.authorName },
+        image: post.media?.[0]?.url,
+        mainEntityOfPage: { "@type": "WebPage", "@id": url },
+        articleSection: post.category,
+    }
+
     return (
         <>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
+
             <PageHeader
                 title={post.title}
                 parentPage={{ title: "Blog", href: "/blog" }}
@@ -125,14 +148,16 @@ async function BlogDetailMain({ id }: { id: string }) {
             />
 
             {/* Meta */}
-            <div className="mt-4 container px-6 mx-auto flex flex-wrap gap-4 text-sm text-muted">
-                <span className="capitalize">
-                    {dashedToCapitalized(post.category)}
-                </span>
-                <span>•</span>
-                <span>{formatPostDate(post.createdAt)}</span>
-                <span>•</span>
-                <span>By {post.authorName}</span>
+            <div className="mt-4 container px-6 mx-auto">
+                <div className="max-w-3xl mx-auto flex flex-wrap gap-4 text-sm text-muted">
+                    <span className="capitalize">
+                        {dashedToCapitalized(post.category)}
+                    </span>
+                    <span>•</span>
+                    <span>{formatPostDate(post.createdAt)}</span>
+                    <span>•</span>
+                    <span>By {post.authorName}</span>
+                </div>
             </div>
 
             {/* Media */}
@@ -140,31 +165,37 @@ async function BlogDetailMain({ id }: { id: string }) {
 
             {/* Content */}
             <section className="container my-12 px-6 mx-auto">
-                <div
-                    className="prose prose-neutral prose-invert max-w-none"
-                    dangerouslySetInnerHTML={{ __html: post.content }}
-                />
+                <PostContent html={post.content} className="prose prose-neutral prose-invert max-w-3xl mx-auto text-lg" />
             </section>
 
             {/* Likes and comments count */}
-            <section className="container my-12 px-6 mx-auto flex gap-4 flex-wrap">
-                <HeartTick size="large" variant="secondary" label="5" />
-                <div className="text-3xl text-muted p-2 rounded-lg flex items-center gap-2">
-                    <span><BiCommentDetail /></span>
-                    <span className="text-2xl">3</span>
+            <section className="container my-12 px-6 mx-auto">
+                <div className="max-w-3xl mx-auto flex gap-4 flex-wrap">
+                    <LikeButton
+                        postId={post.id}
+                        initialLiked={!!authUser && post.likes.includes(authUser.userId)}
+                        initialCount={post.likes.length}
+                        size="large"
+                        variant="secondary"
+                        requireAuth={!authUser}
+                    />
+                    <div className="text-3xl text-muted p-2 rounded-lg flex items-center gap-2">
+                        <span><BiCommentDetail /></span>
+                        <span className="text-2xl">{comments.length}</span>
+                    </div>
                 </div>
             </section>
 
             {/* Comments */}
             <section className="py-12 bg-gray-100 dark:bg-gray-900">
                 <div className="container px-6 mx-auto">
-                    <h3 className="text-2xl font-semibold mb-4">Leave a Comment</h3>
-                    <CommentForm />
-                    <div className="py-4" />
-                    <h4 className="text-xl font-semibold mb-4">Comments</h4>
-                    <Suspense fallback={<LoadingSpinner />}>
-                        <BlogComments />
-                    </Suspense>
+                    <div className="max-w-3xl mx-auto">
+                        <h3 className="text-2xl font-semibold mb-4">Leave a Comment</h3>
+                        <CommentForm postId={post.id} isAuthenticated={!!authUser} />
+                        <div className="py-4" />
+                        <h4 className="text-xl font-semibold mb-4">Comments</h4>
+                        <BlogComments comments={comments} currentUserId={authUser?.userId} />
+                    </div>
                 </div>
             </section>
             <RelatedPosts id={post.id} category={post.category} />

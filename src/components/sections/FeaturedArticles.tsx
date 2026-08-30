@@ -8,6 +8,7 @@ import { User } from "@/types/auth"; // adjust to your User type
 import { WithId, ObjectId } from "mongodb";
 import { getCollection } from "@/lib/db";
 import { stripHtml } from "@/utils/stripHTML";
+import getAuthUser from "@/lib/auth/getAuthUser";
 
 export default function FeaturedArticles() {
     return (
@@ -60,15 +61,27 @@ const serializePosts = (
 
 async function FeaturedPostCards() {
     let posts: SafePost[] = [];
+    const authUser = await getAuthUser();
 
     try {
-        // 1. Fetch latest 3 posts
+        // 1. Fetch latest 3 featured posts, backfilling with recent published
+        // posts if fewer than 3 are marked featured
         const postsCollection = await getCollection<Post>("posts");
-        const rawPosts = await postsCollection
-            .find({ featured: true })
+        const rawFeatured = await postsCollection
+            .find({ featured: true, status: "published" })
             .sort({ createdAt: -1 })
             .limit(3)
             .toArray();
+
+        let rawPosts = rawFeatured;
+        if (rawPosts.length < 3) {
+            const fallback = await postsCollection
+                .find({ status: "published", _id: { $nin: rawPosts.map((p) => p._id) } })
+                .sort({ createdAt: -1 })
+                .limit(3 - rawPosts.length)
+                .toArray();
+            rawPosts = [...rawPosts, ...fallback];
+        }
 
         // 2. Collect unique userIds
         const userIds = [...new Set(rawPosts.map((p) => p.userId.toString()))];
@@ -90,37 +103,54 @@ async function FeaturedPostCards() {
         throw new Error("Failed to load posts");
     }
 
+    if (posts.length === 0) {
+        return <p className="text-muted">No articles published yet.</p>;
+    }
+
+    // Same relative ordering as the original 3-post layout, generalized to
+    // however many posts are actually available
+    const main = posts[posts.length - 1];
+    const secondary = posts.slice(0, posts.length - 1).reverse();
+
     return (
         <div className="grid gap-8 lg:grid-cols-10">
             {/* Main (large) card */}
             <div className="lg:col-span-6">
                 <FeaturedPostCard
-                    category={posts[2].category}
-                    id={posts[2].id}
-                    media={posts[2].media}
-                    title={posts[2].title}
-                    content={stripHtml(posts[2].content)}
-                    authorName={posts[2].authorName || ""}
-                    createdAt={posts[2].createdAt}
+                    category={main.category}
+                    id={main.id}
+                    slug={main.slug}
+                    media={main.media}
+                    title={main.title}
+                    content={stripHtml(main.content)}
+                    authorName={main.authorName || ""}
+                    createdAt={main.createdAt}
+                    likes={main.likes}
+                    currentUserId={authUser?.userId}
                 />
             </div>
 
             {/* Secondary (smaller) cards */}
-            <div className="lg:col-span-4 space-y-8">
-                {[posts[1], posts[0]].map((post) => (
-                    <FeaturedPostCard
-                        key={post.id}
-                        variant="secondary"
-                        category={post.category}
-                        id={post.id}
-                        media={post.media}
-                        title={post.title}
-                        content={stripHtml(post.content)}
-                        authorName={post.authorName || ""}
-                        createdAt={post.createdAt}
-                    />
-                ))}
-            </div>
+            {secondary.length > 0 && (
+                <div className="lg:col-span-4 space-y-8">
+                    {secondary.map((post) => (
+                        <FeaturedPostCard
+                            key={post.id}
+                            variant="secondary"
+                            category={post.category}
+                            id={post.id}
+                            slug={post.slug}
+                            media={post.media}
+                            title={post.title}
+                            content={stripHtml(post.content)}
+                            authorName={post.authorName || ""}
+                            createdAt={post.createdAt}
+                            likes={post.likes}
+                            currentUserId={authUser?.userId}
+                        />
+                    ))}
+                </div>
+            )}
         </div>
     );
 }

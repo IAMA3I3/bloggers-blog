@@ -66,8 +66,6 @@ export default function Hero() {
 
 async function HeroPostCards() {
 
-    await new Promise(res => setTimeout(res, 2000))
-
     return (
         <div className="space-y-4">
             {/* Card 1 */}

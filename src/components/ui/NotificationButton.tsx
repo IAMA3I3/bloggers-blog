@@ -1,14 +1,18 @@
 "use client"
 
-// import { mockNotifications } from "@/temp/notificationData"
 import { formatPostDate } from "@/utils/formatPostDate"
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 import { FaRegBell } from "react-icons/fa"
 import { LinkListItem } from "./ListItem"
-import { Notification } from "@/types/notification"
+import { SafeNotification } from "@/types/notification"
 
-export default function NotificationButton() {
+type NotificationButtonProps = {
+    notifications: SafeNotification[]
+    unreadCount: number
+}
+
+export default function NotificationButton({ notifications, unreadCount }: NotificationButtonProps) {
 
     const dropDownRef = useRef<HTMLDivElement | null>(null)
     const buttonRef = useRef<HTMLButtonElement | null>(null)
@@ -16,8 +20,7 @@ export default function NotificationButton() {
     const [dropedMenu, setDropedMenu] = useState(false)
 
     const toggleDropMenu = () => {
-        // setDropedMenu(prev => !prev)
-        setDropedMenu(false)
+        setDropedMenu(prev => !prev)
     }
 
     const closeDropMenu = () => {
@@ -47,14 +50,11 @@ export default function NotificationButton() {
         }
     }, [dropedMenu])
 
-    // const notifications = mockNotifications.filter(i => i.status === "unread")
-    const notifications: Notification[] = []
-
     return (
         <div className=" relative">
             <button ref={buttonRef} onClick={toggleDropMenu} className={`${dropedMenu ? " bg-gray-200 dark:bg-slate-800" : " hover:bg-gray-200 dark:hover:bg-slate-800"} relative cursor-pointer p-2 rounded-lg transition-colors`}>
                 <FaRegBell className="w-6 h-6" />
-                {notifications.length > 0 && <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>}
+                {unreadCount > 0 && <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>}
             </button>
             <div
                 ref={dropDownRef}
@@ -67,12 +67,12 @@ export default function NotificationButton() {
                 <div className=" space-y-2">
                     {
                         notifications.length === 0 ? (
-                            <p className=" text-muted text-sm">No unread notifications</p>
+                            <p className=" text-muted text-sm">No notifications yet</p>
                         ) : notifications.slice(0, 5).map(notification => (
                             <LinkListItem
-                                key={notification._id}
+                                key={notification.id}
                                 onClick={closeDropMenu}
-                                href={`/dashboard/notifications/${notification._id}`}
+                                href={`/dashboard/notifications/${notification.id}`}
                                 mutedText={formatPostDate(notification.createdAt)}
                                 text={notification.content}
                             />

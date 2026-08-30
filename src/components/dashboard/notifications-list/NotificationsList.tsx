@@ -1,13 +1,8 @@
-// import { mockNotifications } from "@/temp/notificationData"
 import NotificationsListClient from "./NotificationsList.client"
-import { Notification } from "@/types/notification"
+import { getAllNotifications } from "@/actions/notification"
 
 export default async function NotificationsList() {
-
-    await new Promise(res => setTimeout(res, 2000))
-
-    // const notifications = mockNotifications
-    const notifications: Notification[] = []
+    const notifications = await getAllNotifications()
 
     return <NotificationsListClient notifications={notifications} />
 }

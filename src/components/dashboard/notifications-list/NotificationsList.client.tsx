@@ -2,13 +2,13 @@
 
 import { ActionListItem } from "@/components/ui/ListItem"
 import Pagination from "@/components/ui/Pagination"
-import { Notification } from "@/types/notification"
+import { SafeNotification } from "@/types/notification"
 import { formatPostDate } from "@/utils/formatPostDate"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect } from "react"
 
 type NotificationsListClientProps = {
-    notifications: Notification[]
+    notifications: SafeNotification[]
 }
 
 const NOTIFICATIONS_PER_PAGE = 10
@@ -30,7 +30,7 @@ export default function NotificationsListClient({ notifications }: Notifications
         const params = new URLSearchParams(searchParams.toString())
         params.set("page", page.toString())
 
-        router.push(`/dashboard/users?${params.toString()}`, { scroll: false })
+        router.push(`/dashboard/notifications?${params.toString()}`, { scroll: false })
     }
 
     useEffect(() => {
@@ -49,10 +49,10 @@ export default function NotificationsListClient({ notifications }: Notifications
             {
                 currentNotifications.map(notification => (
                     <ActionListItem
-                        key={notification._id}
+                        key={notification.id}
                         mutedText={formatPostDate(notification.createdAt)}
                         mainText={notification.content}
-                        href={`/dashboard/notifications/${notification._id}`}
+                        href={`/dashboard/notifications/${notification.id}`}
                         status={{
                             variant: notification.status === "unread" ? "success" : "secondary",
                             text: notification.status === "unread" ? "Unread" : "Opened"
